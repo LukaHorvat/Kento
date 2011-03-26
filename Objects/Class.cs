@@ -5,8 +5,11 @@ using System.Text;
 
 namespace Kento
 {
-	abstract class Literal : Variable
+	class Object : CodeBlock
 	{
-		public abstract object Evaluate ();
+		public Object ( Expression Code )
+			: base( Code )
+		{
+		}
 	}
 }

@@ -42,25 +42,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Boolean.cs" />
-    <Compile Include="Compile.cs" />
+    <Compile Include="ExpressionSequence.cs" />
+    <Compile Include="IRequiresRuntime.cs" />
+    <Compile Include="Objects\Array.cs" />
+    <Compile Include="Objects\Boolean.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="Expression.cs" />
-    <Compile Include="Identifier.cs" />
-    <Compile Include="Literal.cs" />
-    <Compile Include="Number.cs" />
-    <Compile Include="Operator.cs" />
+    <Compile Include="Objects\Class.cs" />
+    <Compile Include="Objects\CodeBlock.cs" />
+    <Compile Include="Objects\Function.cs" />
+    <Compile Include="Objects\Identifier.cs" />
+    <Compile Include="Objects\Literal.cs" />
+    <Compile Include="Objects\Number.cs" />
+    <Compile Include="Objects\Type.cs" />
     <Compile Include="Operators.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="String.cs" />
+    <Compile Include="Objects\String.cs" />
+    <Compile Include="Standard Library\ConsoleInput.cs" />
+    <Compile Include="Standard Library\ConsoleOutput.cs" />
+    <Compile Include="Standard Library\ExternalFunction.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
+    <Compile Include="TokenList.cs" />
+    <Compile Include="TokenListNode.cs" />
     <Compile Include="Value.cs" />
     <Compile Include="Variable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="bin\Debug\scripts\FirstTestScript.kt" />
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

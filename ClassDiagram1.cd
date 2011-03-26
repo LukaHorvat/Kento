@@ -1,1 +1,410 @@
- 
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Kento.Compiler" Collapsed="true">
+    <Position X="95.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAIAgAACAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Compiler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Expression" Collapsed="true">
+    <Position X="74.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAFAgEAEgAAAAAAAAAAAQAIgAAAAAA=</HashCode>
+      <FileName>Expression.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Array" Collapsed="true">
+    <Position X="92.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Objects\Array.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Boolean" Collapsed="true">
+    <Position X="88.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAgAAAAAAACAAAAAAgAAAAAA=</HashCode>
+      <FileName>Objects\Boolean.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Object" Collapsed="true">
+    <Position X="79.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Objects\Class.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.CodeBlock" Collapsed="true">
+    <Position X="79.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAgAAAAAAACAAAAAggAIAAAA=</HashCode>
+      <FileName>Objects\CodeBlock.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Function" Collapsed="true">
+    <Position X="81.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Objects\Function.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Identifier" Collapsed="true">
+    <Position X="92.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAgAAAAAEAAAAAAAAgAEAAAA=</HashCode>
+      <FileName>Objects\Identifier.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Literal" Collapsed="true">
+    <Position X="86" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Objects\Literal.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Number" Collapsed="true">
+    <Position X="83.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAgAAAAAAACAAAAAAgAAAAAA=</HashCode>
+      <FileName>Objects\Number.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.String" Collapsed="true">
+    <Position X="86" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAgAAAAAAACAAAAAAgAAAAAA=</HashCode>
+      <FileName>Objects\String.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Type" Collapsed="true">
+    <Position X="77" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Objects\Type.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Operator" Collapsed="true">
+    <Position X="59.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAEAAAEAAAAAAAAAAABAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Operators" Collapsed="true">
+    <Position X="97" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAABAAAAAAAAAAIAAAEAAAABAAAAAAIAAAACAACAAQ=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.SubtractiveAssignment" Collapsed="true">
+    <Position X="56.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Subtraction" Collapsed="true">
+    <Position X="56.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.ParenthesisOpen" Collapsed="true">
+    <Position X="56.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.ParenthesisClosed" Collapsed="true">
+    <Position X="56.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.NotOperator" Collapsed="true">
+    <Position X="56.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.NotEqualTo" Collapsed="true">
+    <Position X="56.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.MultiplicativeAssignment" Collapsed="true">
+    <Position X="56.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Multiplication" Collapsed="true">
+    <Position X="56.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.ModOperator" Collapsed="true">
+    <Position X="58.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.ModAssignment" Collapsed="true">
+    <Position X="58.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.LogicalOr" Collapsed="true">
+    <Position X="58.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.LogicalAnd" Collapsed="true">
+    <Position X="58.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.LessThan" Collapsed="true">
+    <Position X="58.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.LessOrEqual" Collapsed="true">
+    <Position X="58.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Increment" Collapsed="true">
+    <Position X="58.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.GreaterThan" Collapsed="true">
+    <Position X="58.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.GreaterOrEqual" Collapsed="true">
+    <Position X="60.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.InvokeOperator" Collapsed="true">
+    <Position X="60.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.EqualTo" Collapsed="true">
+    <Position X="60.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.AdditiveAssignment" Collapsed="true">
+    <Position X="60.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Assignment" Collapsed="true">
+    <Position X="60.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Decrement" Collapsed="true">
+    <Position X="60.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Division" Collapsed="true">
+    <Position X="60.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.DivisiveAssignment" Collapsed="true">
+    <Position X="60.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Addition" Collapsed="true">
+    <Position X="63" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Unidentified" Collapsed="true">
+    <Position X="63" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.DotOperator" Collapsed="true">
+    <Position X="63" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.IfOperator" Collapsed="true">
+    <Position X="63" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.ElseOperator" Collapsed="true">
+    <Position X="63" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.MakeCodeBlock" Collapsed="true">
+    <Position X="63" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.CurlyBracesOpen" Collapsed="true">
+    <Position X="63" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.CurlyBracesClosed" Collapsed="true">
+    <Position X="63" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Program" Collapsed="true">
+    <Position X="98.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Token" Collapsed="true">
+    <Position X="70.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Token.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Tokenizer" Collapsed="true">
+    <Position X="95.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAwAA=</HashCode>
+      <FileName>Tokenizer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.TokenList" Collapsed="true">
+    <Position X="97" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAEAAAAACAQAAAAEAAAACAAAAAAgAAAACAAAAAgA=</HashCode>
+      <FileName>TokenList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.TokenListNode" Collapsed="true">
+    <Position X="98.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAgAAAAIAAAAAAAAAACAAAAAgAAIAAAA=</HashCode>
+      <FileName>TokenListNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Value" Collapsed="true">
+    <Position X="82.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Value.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.Variable" Collapsed="true">
+    <Position X="88.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Variable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.NoValue" Collapsed="true">
+    <Position X="72.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Variable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Kento.ConditionNotMet" Collapsed="true">
+    <Position X="90.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Variable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Kento.BracketType" Collapsed="true">
+    <Position X="95.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAABAAAAAEAAAABAAgAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Kento.OperatorType" Collapsed="true">
+    <Position X="95.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAIAAAAAAAAIAAAIAAAAAAAAAAAAkAAAAAAA=</HashCode>
+      <FileName>Operators.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Kento.ParseState" Collapsed="true">
+    <Position X="97" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAgAAIAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Tokenizer.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI Semibold" Size="8.25" />
+</ClassDiagram>

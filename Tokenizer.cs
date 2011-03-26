@@ -15,19 +15,9 @@ namespace Kento
 
 	class Tokenizer
 	{
-		static string[] multisymboledOperators = new string[] { "+=", "-=", "*=", "/=", "%=", "++", "--", ">=", "<=", "==", "!=", "()" };
-		public static Expression GetRPN ( Expression Infix )
+		public static Value ParseInfixString ( string Infix )
 		{
-
-			return new Expression();
-		}
-		public static Expression GetRPN ( string Infix )
-		{
-			return GetRPN( ParseInfixString( Infix ) );
-		}
-		public static Expression ParseInfixString ( string Infix )
-		{
-			var tokens = new LinkedList<Token>(); ;
+			var tokens = new TokenList(); ;
 			var array = splitString( Infix );
 			foreach ( string str in array )
 			{
@@ -36,95 +26,110 @@ namespace Kento
 					case ParseState.Letters:
 						if ( str[ 0 ] == '"' )
 						{
-							tokens.AddLast( new String( str.Substring( 1, str.Length - 2 ) ) );
-						} else if ( str == "true" )
-						{
-							tokens.AddLast( new Boolean( true ) );
-						} else if ( str == "false" )
-						{
-							tokens.AddLast( new Boolean( false ) );
+							tokens.Add( new String( str.Substring( 1, str.Length - 2 ) ) );
 						} else
 						{
-							tokens.AddLast( new Identifier( str ) );
+							if ( Operators.OperatorDictionary.ContainsKey( str ) )
+							{
+								tokens.Add( (Token)Activator.CreateInstance( Operators.OperatorDictionary[ str ] ) );
+							} else
+							{
+								switch ( str )
+								{
+									case "true":
+										tokens.Add( new Boolean( true ) );
+										break;
+									case "false":
+										tokens.Add( new Boolean( false ) );
+										break;
+									default:
+										tokens.Add( new Identifier( str ) );
+										break;
+								}
+							}
 						}
 						break;
 					case ParseState.Numbers:
-						tokens.AddLast( new Number( double.Parse( str, System.Globalization.CultureInfo.InvariantCulture ) ) );
+						tokens.Add( new Number( double.Parse( str, System.Globalization.CultureInfo.InvariantCulture ) ) );
 						break;
 					case ParseState.Signs:
-						if ( tokens.Last.Value is Identifier && str == "(" ) tokens.AddLast( new InvokeOperator() );
-						if ( Operators.OperatorDictionary.ContainsKey( str ) )
+						Func<BracketType, bool> fn = ( x => Operators.RepresentationDictionary[ x.OpeningBracket ] == str );
+						if ( Operators.Brackets.Any( fn ) )
 						{
-							tokens.AddLast( (Operator)Activator.CreateInstance( Operators.OperatorDictionary[ str ] ) );
+							tokens.Add( (Token)Activator.CreateInstance( Operators.Brackets.First( fn ).SpecialOperator ) );
+							tokens.Add( new ParenthesisOpen() );
+						} else if ( Operators.Brackets.Any( x => Operators.RepresentationDictionary[ x.ClosingBracket ] == str ) )
+						{
+							tokens.Add( new ParenthesisClosed() );
 						} else
 						{
-							tokens.AddLast( new Unidentified() );
+							if ( tokens.Last.Value is Identifier && str == "(" ) tokens.Add( new InvokeOperator() );
+							if ( tokens.Last.Value is Identifier && str == "++" ) tokens.Add( new SufixIncrement() );
+							else if ( !( tokens.Last.Value is Identifier ) && str == "++" ) tokens.Add( new PrefixIncrement() );
+							else if ( tokens.Last.Value is Identifier && str == "--" ) tokens.Add( new SufixDecrement() );
+							else if ( !( tokens.Last.Value is Identifier ) && str == "--" ) tokens.Add( new PrefixDecrement() );
+							else if ( Operators.OperatorDictionary.ContainsKey( str ) )
+							{
+								tokens.Add( (Operator)Activator.CreateInstance( Operators.OperatorDictionary[ str ] ) );
+							} else
+							{
+								tokens.Add( new Unidentified() );
+							}
 						}
 						break;
 				}
 			}
-			return new Expression();
+			var test = Expression.CreateValueFromExpression( tokens );
+			return test;
 		}
-		static LinkedList<string> splitString ( string Expression )
+		static LinkedList<string> splitString ( string Exp )
 		{
+			var Expression = new StringBuilder( Exp );
+			Expression.Replace( '\n', ' ' );
+			Expression.Replace( '\t', ' ' );
+			Expression.Replace( '\r', ' ' );
+			Expression.Replace( @"\n", '\n' + "" );
+			Expression.Replace( @"\r", '\r' + "" );
+			Expression.Replace( @"\t", '\t' + "" );
+			var alreadyDone = new List<bool>(); //Stores the already processed operators so the ones like ++ and + don't get processed twice
 			bool inQuote = false;
 			for ( int i = 0 ; i < Expression.Length ; ++i )
 			{
-				if ( Expression[ i ] == ' ' && !inQuote )
-				{
-					Expression = Expression.Remove( i, 1 );
-					--i;
-				} else if ( Expression[ i ] == '"' ) inQuote = inQuote ? false : true;
-			}//Clear spaces
+				if ( Expression[ i ] == '"' ) inQuote = inQuote ? false : true;
+				if ( inQuote && Expression[ i ] == ' ' ) Expression[ i ] = (char)7;
+				alreadyDone.Add( inQuote );
+			}
 
-			ParseState state = ParseState.Empty;
-			ParseState currentState;
-			var array = new LinkedList<string>();
-			var buffer = new StringBuilder();
-			for ( int i = 0 ; i < Expression.Length ; ++i )
+			var operatorList = Operators.OperatorDictionary.Keys.ToList();
+			operatorList.Sort( new Comparison<string>( compare ) );
+			for ( int i = 0 ; i < operatorList.Count ; ++i )
 			{
-				if ( state == ParseState.Empty )//If no state, get it
+				for ( int j = 0 ; j <= Expression.Length - operatorList[ i ].Length ; j++ )
 				{
-					if ( buffer.Length > 0 )
+					if ( !alreadyDone[ j ] && Expression.ToString( j, operatorList[ i ].Length ) == operatorList[ i ] )
 					{
-						array.AddLast( buffer.ToString() );
-					}
-					state = getCharType( Expression[ i ] );
-					currentState = state;
-					buffer = new StringBuilder();
-				} else
-				{
-					currentState = getCharType( Expression[ i ] );
-				}
-				if ( getCharType( Expression[ i ] ) == state )
-				{
-					if ( state == ParseState.Signs )//If symbols, check if there's a multisymboled operator comming
-					{
-						if ( i < Expression.Length - 1 && multisymboledOperators.Contains( Expression.Substring( i, 2 ) ) ) //If yes, add it to the array and advance the parser
+						for ( int k = 0 ; k < operatorList[ i ].Length ; ++k )
 						{
-							buffer.Append( Expression.Substring( i, 2 ) );
-							++i;
-							state = ParseState.Empty;
-						} else
-						{
-							buffer.Append( Expression[ i ] ); //Else just add the single symbol to the array
-							state = ParseState.Empty;
+							alreadyDone[ j + k ] = true;
 						}
-					} else
-					{
-						buffer.Append( Expression[ i ] ); //If not symbols, continue appending
+						alreadyDone.Insert( j + operatorList[ i ].Length, true );
+						alreadyDone.Insert( j, true );
+						Expression = Expression.Insert( j + operatorList[ i ].Length, " " );
+						Expression = Expression.Insert( j, " " );
 					}
-				} else //If the state changed, add the buffer to the array
-				{
-					--i;
-					state = ParseState.Empty;
 				}
 			}
-			if ( buffer.Length > 0 )
+
+			var temp = new LinkedList<string>( Expression.ToString().Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries ) );
+			for ( var node = temp.First ; node != null ; node = node.Next )
 			{
-				array.AddLast( buffer.ToString() );
+				node.Value = node.Value.Replace( '\a', ' ' );
 			}
-			return array;
+			return temp;
+		}
+		static int compare ( string First, string Second )
+		{
+			return Second.Length - First.Length;
 		}
 		/// <summary>
 		/// Determines if the given char is a number, a letter or a symbol
