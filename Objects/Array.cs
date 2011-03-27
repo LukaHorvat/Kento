@@ -13,7 +13,6 @@ namespace Kento
 			get { return arr; }
 			set { arr = value; }
 		}
-
 		public Array ( params Value[] Values )
 			: base()
 		{

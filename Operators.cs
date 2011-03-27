@@ -255,6 +255,8 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val - ( Second as Number ).Val );
@@ -268,6 +270,8 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val / ( Second as Number ).Val );
@@ -299,6 +303,8 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val * ( Second as Number ).Val );
@@ -312,6 +318,8 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val % ( Second as Number ).Val );
@@ -385,7 +393,7 @@ namespace Kento
 			First = First.Evaluate();
 			if ( First is Expression )
 			{
-				return new CodeBlock( (First as Expression) );
+				return new CodeBlock( ( First as Expression ) );
 			} else return new NoValue();
 		}
 	}
@@ -428,13 +436,15 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First.GetType() == Second.GetType() )
+			First = First.Evaluate();
+			Second = Second.Evaluate();
+			if ( !( First is NoValue || Second is NoValue ) && First.GetType() == Second.GetType() )
 			{
 				if ( First is Number ) return new Boolean( ( First as Number ).Val == ( Second as Number ).Val );
 				else if ( First is String ) return new Boolean( ( First as String ).Val == ( Second as String ).Val );
 				else if ( First is Boolean ) return new Boolean( ( First as Boolean ).Val == ( Second as Boolean ).Val );
 				else return new NoValue();
-			} else return new Boolean( false );
+			} else return new NoValue();
 		}
 	}
 	class LessThan : Operator
@@ -557,32 +567,33 @@ namespace Kento
 		}
 	}
 
-	class IfOperator : Operator
+	class IfOperator : Operator, IRequiresRuntime
 	{
 		public IfOperator ()
 			: base( 15, OperatorType.PrefixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Boolean && ( Second is CodeBlock || Second is Expression ) )
+			First = First.Evaluate();
+			if ( First is Boolean && ( Second is CodeBlock ) )
 			{
-				if ( ( First as Boolean ).Val ) return Second;
+				if ( ( First as Boolean ).Val ) return ( Second as CodeBlock ).Run();
 				else return new ConditionNotMet();
 			} else return new NoValue();
 		}
 	}
-	class ElseOperator : Operator
+	class ElseOperator : Operator, IRequiresRuntime
 	{
 		public ElseOperator ()
 			: base( 16, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is ConditionNotMet ) return Second;
+			if ( First is ConditionNotMet ) return ( Second as CodeBlock ).Run();
 			else return new NoValue();
 		}
 	}
-	class FunctionOperator : Operator, IRequiresRuntime
+	class FunctionOperator : Operator
 	{
 		public FunctionOperator ()
 			: base( 14, OperatorType.PrefixBinary ) { }

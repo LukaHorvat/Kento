@@ -7,6 +7,16 @@ namespace Kento
 {
 	abstract class ExternalFunction : Function
 	{
-		public ExternalFunction () : base( new Array(), new CodeBlock( new List<Token>() ) ) { }
+		string representation;
+		public string Representation
+		{
+			get { return representation; }
+			set { representation = value; }
+		}
+		public ExternalFunction ( string Name )
+			: base( new Array(), new CodeBlock( new List<Token>() ) )
+		{
+			representation = Name;
+		}
 	}
 }

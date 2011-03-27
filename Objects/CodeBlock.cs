@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace Kento
 {
@@ -60,7 +61,8 @@ namespace Kento
 					} else
 					{
 						Value second = (Value)solvingStack.Pop();
-						solvingStack.Push( op.Operate( ( solvingStack.Pop() as Value ), second ) );
+						Value result = op.Operate( ( solvingStack.Pop() as Value ), second );
+						solvingStack.Push( result );
 					}
 				} else
 				{

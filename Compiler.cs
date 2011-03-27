@@ -2,11 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace Kento
 {
 	class Compiler
 	{
+		static float lastRunningTime;
+		public static float LastRunningTime
+		{
+			get { return Compiler.lastRunningTime; }
+			set { Compiler.lastRunningTime = value; }
+		}
+
 		static bool runtime;
 		public static bool Runtime
 		{
@@ -39,11 +48,12 @@ namespace Kento
 		public static void Run ( List<Token> Code )
 		{
 			CodeBlock defaultScope = new CodeBlock( new List<Token>() );
-			defaultScope.Identifiers[ "ConsoleOutput" ] = new ConsoleOutput();
-			defaultScope.Identifiers[ "ConsoleInput" ] = new ConsoleInput();
+			defaultScope.Identifiers = Compiler.LoadStandardLibrary();
 			scopeStack.Push( defaultScope );
 
 			runtime = true;
+			Stopwatch timer = new Stopwatch(); timer.Start();
+
 			if ( Code[ 0 ] is CodeBlock )
 			{
 				( Code[ 0 ] as CodeBlock ).Run();
@@ -51,6 +61,22 @@ namespace Kento
 			{
 				new CodeBlock( Code ).Run();
 			}
+
+			timer.Stop(); lastRunningTime = timer.ElapsedTicks / (float)Stopwatch.Frequency * 1000;
+		}
+		public static Dictionary<string, Value> LoadStandardLibrary ()
+		{
+			var lib = new Dictionary<string, Value>();
+			var asm = Assembly.GetExecutingAssembly();
+			var externalFunctions = asm.GetTypes().Where( x => x.IsSubclassOf( typeof( ExternalFunction ) ) );
+
+			foreach ( System.Type fn in externalFunctions )
+			{
+				ExternalFunction instance = ( Activator.CreateInstance( fn ) as ExternalFunction );
+				lib[ instance.Representation ] = instance;
+			}
+
+			return lib;
 		}
 	}
 }
