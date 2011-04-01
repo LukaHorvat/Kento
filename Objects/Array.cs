@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kento
 {
-	class Array : Value
+	public class Array : Value
 	{
 		List<Value> arr;
 		public List<Value> Arr
@@ -14,9 +14,12 @@ namespace Kento
 			set { arr = value; }
 		}
 		public Array ( params Value[] Values )
-			: base()
 		{
 			arr = new List<Value>( Values );
+		}
+		public Array ( List<Value> List )
+		{
+			arr = List;
 		}
 		public Array ()
 		{
@@ -29,6 +32,15 @@ namespace Kento
 		public override Array ToArray ()
 		{
 			return this;
+		}
+		public override Value Clone ()
+		{
+			var list = new List<Value>();
+			foreach ( var val in arr )
+			{
+				list.Add( val.Clone() );
+			}
+			return new Array( list );
 		}
 	}
 }

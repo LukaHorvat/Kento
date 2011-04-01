@@ -105,18 +105,18 @@ namespace Kento
 		{
 			if ( Unary )
 			{
-				Value result = new NoValue();
+				Value result = NoValue.Value;
 				if ( !( ( List.First.Value as Operator ) is IRequiresRuntime ) )
 				{
-					result = ( (Operator)List.First.Value ).Operate( (Value)List.First.Next.Value, new NoValue() );
+					result = ( (Operator)List.First.Value ).Operate( (Value)List.First.Next.Value, NoValue.Value );
 				}
 				if ( result is NoValue )
 				{
-					return new Expression( (Value)List.First.Next.Value, new NoValue(), (Operator)List.First.Value, true );
+					return new Expression( (Value)List.First.Next.Value, NoValue.Value, (Operator)List.First.Value, true );
 				} else return result;
 			} else
 			{
-				Value result = new NoValue();
+				Value result = NoValue.Value;
 				if ( !( ( List.First.Next.Value as Operator ) is IRequiresRuntime ) )
 				{
 					result = ( (Operator)List.First.Next.Value ).Operate( (Value)List.First.Value, (Value)List.First.Next.Next.Value );

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace Kento
 {
@@ -134,17 +135,27 @@ namespace Kento
 			add( "}", typeof( CurlyBracesClosed ) );
 			add( ",", typeof( CommaOperator ) );
 			add( "function", typeof( FunctionOperator ) );
+			add( "return", typeof( ReturnOperator ) );
+			add( "continue", typeof( ContinueOperator ) );
+			add( "break", typeof( BreakOperator ) );
+			add( "while", typeof( WhileOperator ) );
+			add( "[", typeof( SquareBracketsOpen ) );
+			add( "]", typeof( SquareBracketsClosed ) );
+			add( "class", typeof( ClassOperator ) );
+			add( "new", typeof( NewOperator ) );
 
 			representationDictionary.Add( typeof( SufixDecrement ), "--" );
 			representationDictionary.Add( typeof( PrefixDecrement ), "--" );
 			representationDictionary.Add( typeof( SufixIncrement ), "++" );
 			representationDictionary.Add( typeof( PrefixIncrement ), "++" );
-			representationDictionary.Add( typeof( InvokeOperator ), "()" );
-			representationDictionary.Add( typeof( MakeCodeBlock ), "{}" );
+			representationDictionary.Add( typeof( InvokeOperator ), "invoke!" );
+			representationDictionary.Add( typeof( MakeCodeBlock ), "makeCB!" );
+			representationDictionary.Add( typeof( AccessValueAtIndex ), "index!" );
 
 			lowestPrecedance = representationDictionary.Keys.Max( x => ( Activator.CreateInstance( x ) as Operator ).Precedance );
 
 			brackets.AddLast( new BracketType( typeof( CurlyBracesOpen ), typeof( CurlyBracesClosed ), typeof( MakeCodeBlock ) ) );
+			brackets.AddLast( new BracketType( typeof( SquareBracketsOpen ), typeof( SquareBracketsClosed ), typeof( AccessValueAtIndex ) ) );
 		}
 		static void add ( string Rep, System.Type Type )
 		{
@@ -152,6 +163,7 @@ namespace Kento
 			representationDictionary.Add( Type, Rep );
 		}
 	}
+
 	class SubtractiveAssignment : Operator, IRequiresRuntime
 	{
 		public SubtractiveAssignment ()
@@ -159,13 +171,15 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
+			var eFirst = First.Evaluate();
 			Second = Second.Evaluate();
-			if ( First is Number && Second is Number )
+			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				( First as Number ).Val -= ( Second as Number ).Val;
-				return First.Evaluate();
-			} else return new NoValue();
+				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val - ( Second as Number ).Val ) );
+				var toReturn = First.Evaluate();
+				Compiler.ExitInstanceScope();
+				return toReturn;
+			} else return NoValue.Value;
 		}
 	}
 	class DivisiveAssignment : Operator, IRequiresRuntime
@@ -175,13 +189,15 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
+			var eFirst = First.Evaluate();
 			Second = Second.Evaluate();
-			if ( First is Number && Second is Number )
+			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				( First as Number ).Val /= ( Second as Number ).Val;
-				return First.Evaluate();
-			} else return new NoValue();
+				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val / ( Second as Number ).Val ) );
+				var toReturn = First.Evaluate();
+				Compiler.ExitInstanceScope();
+				return toReturn;
+			} else return NoValue.Value;
 		}
 	}
 	class MultiplicativeAssignment : Operator, IRequiresRuntime
@@ -191,13 +207,15 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
+			var eFirst = First.Evaluate();
 			Second = Second.Evaluate();
-			if ( First is Number && Second is Number )
+			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				( First as Number ).Val *= ( Second as Number ).Val;
-				return First.Evaluate();
-			} else return new NoValue();
+				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val * ( Second as Number ).Val ) );
+				var toReturn = First.Evaluate();
+				Compiler.ExitInstanceScope();
+				return toReturn;
+			} else return NoValue.Value;
 		}
 	}
 	class AdditiveAssignment : Operator, IRequiresRuntime
@@ -207,13 +225,15 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
+			var eFirst = First.Evaluate();
 			Second = Second.Evaluate();
-			if ( First is Number && Second is Number )
+			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				( First as Number ).Val += ( Second as Number ).Val;
-				return First.Evaluate();
-			} else return new NoValue();
+				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val + ( Second as Number ).Val ) );
+				var toReturn = First.Evaluate();
+				Compiler.ExitInstanceScope();
+				return toReturn;
+			} else return NoValue.Value;
 		}
 	}
 	class ModAssignment : Operator, IRequiresRuntime
@@ -223,13 +243,15 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
+			var eFirst = First.Evaluate();
 			Second = Second.Evaluate();
-			if ( First is Number && Second is Number )
+			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				( First as Number ).Val %= ( Second as Number ).Val;
-				return First.Evaluate();
-			} else return new NoValue();
+				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val % ( Second as Number ).Val ) );
+				var toReturn = First.Evaluate();
+				Compiler.ExitInstanceScope();
+				return toReturn;
+			} else return NoValue.Value;
 		}
 	}
 	class Assignment : Operator, IRequiresRuntime
@@ -242,9 +264,11 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier )
 			{
-				Compiler.ExecutingScope.Identifiers[ ( First as Identifier ).Name ] = Second;
-				return First.Evaluate();
-			} else return new NoValue();
+				Compiler.SetValue( First as Identifier, Second );
+				var toReturn = First.Evaluate();
+				Compiler.ExitInstanceScope();
+				return toReturn;
+			} else return NoValue.Value;
 		}
 	}
 
@@ -260,7 +284,7 @@ namespace Kento
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val - ( Second as Number ).Val );
-			} else return new NoValue();
+			} else return NoValue.Value;
 		}
 	}
 	class Division : Operator
@@ -275,7 +299,7 @@ namespace Kento
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val / ( Second as Number ).Val );
-			} else return new NoValue();
+			} else return NoValue.Value;
 		}
 	}
 	class Addition : Operator
@@ -287,13 +311,16 @@ namespace Kento
 		{
 			First = First.Evaluate();
 			Second = Second.Evaluate();
-			if ( First is Number && Second is Number )
+			if ( First is NoValue || Second is NoValue || First is Expression || Second is Expression || First is ExpressionSequence || Second is ExpressionSequence )
+			{
+				return NoValue.Value;
+			} else if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val + ( Second as Number ).Val );
-			} else if ( First is String )
+			} else if ( First is String || Second is String )
 			{
 				return new String( First.ToString() + Second.ToString() );
-			} else return new NoValue();
+			} else return NoValue.Value;
 		}
 	}
 	class Multiplication : Operator
@@ -308,7 +335,7 @@ namespace Kento
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val * ( Second as Number ).Val );
-			} else return new NoValue();
+			} else return NoValue.Value;
 		}
 	}
 	class ModOperator : Operator
@@ -323,7 +350,7 @@ namespace Kento
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val % ( Second as Number ).Val );
-			} else return new NoValue();
+			} else return NoValue.Value;
 		}
 	}
 
@@ -334,7 +361,7 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			return NoValue.Value;
 		}
 	}
 	class ParenthesisClosed : Operator
@@ -344,7 +371,7 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			return NoValue.Value;
 		}
 	}
 	class CurlyBracesOpen : Operator
@@ -354,7 +381,7 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			return NoValue.Value;
 		}
 	}
 	class CurlyBracesClosed : Operator
@@ -364,7 +391,27 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			return NoValue.Value;
+		}
+	}
+	class SquareBracketsOpen : Operator
+	{
+		public SquareBracketsOpen ()
+			: base( 0, OperatorType.Special ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			return NoValue.Value;
+		}
+	}
+	class SquareBracketsClosed : Operator
+	{
+		public SquareBracketsClosed ()
+			: base( 0, OperatorType.Special ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			return NoValue.Value;
 		}
 	}
 	class InvokeOperator : Operator, IRequiresRuntime
@@ -376,11 +423,12 @@ namespace Kento
 		{
 			var eFirst = First.Evaluate();
 			var eSecond = Second.Evaluate().ToArray();
-			var test = Compiler.Runtime;
 			if ( eFirst is Function )
 			{
-				return ( eFirst as Function ).Invoke( eSecond );
-			} else return new NoValue();
+				var toReturn = ( eFirst as Function ).Invoke( eSecond );
+				Compiler.ExitInstanceScope();
+				return toReturn;
+			} else return NoValue.Value;
 		}
 	}
 	class MakeCodeBlock : Operator
@@ -394,7 +442,29 @@ namespace Kento
 			if ( First is Expression )
 			{
 				return new CodeBlock( ( First as Expression ) );
-			} else return new NoValue();
+			} else if ( First is ExpressionSequence )
+			{
+				return new CodeBlock( ( First as ExpressionSequence ).Tokenize() );
+			} else return NoValue.Value;
+		}
+	}
+	class AccessValueAtIndex : Operator, IRequiresRuntime
+	{
+		public AccessValueAtIndex ()
+			: base( 1, OperatorType.InfixBinary ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
+			if ( First is Array && Second is Number )
+			{
+				int index = (int)( ( Second as Number ).Val );
+				if ( index >= 0 && index < ( First as Array ).Arr.Count )
+				{
+					return ( First as Array ).Arr[ index ].Evaluate();
+				} else throw new Exception( "Index out of range" );
+			} else return NoValue.Value;
 		}
 	}
 
@@ -409,7 +479,7 @@ namespace Kento
 			{
 				return new Boolean( ( First as Boolean ).Val ? false : true );
 			}
-			return new NoValue();
+			return NoValue.Value;
 		}
 	}
 
@@ -420,12 +490,14 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First.GetType() == Second.GetType() )
 			{
 				if ( First is Number ) return new Boolean( ( First as Number ).Val != ( Second as Number ).Val );
 				else if ( First is String ) return new Boolean( ( First as String ).Val != ( Second as String ).Val );
 				else if ( First is Boolean ) return new Boolean( ( First as Boolean ).Val != ( Second as Boolean ).Val );
-				else return new NoValue();
+				else return NoValue.Value;
 			} else return new Boolean( true );
 		}
 	}
@@ -443,8 +515,8 @@ namespace Kento
 				if ( First is Number ) return new Boolean( ( First as Number ).Val == ( Second as Number ).Val );
 				else if ( First is String ) return new Boolean( ( First as String ).Val == ( Second as String ).Val );
 				else if ( First is Boolean ) return new Boolean( ( First as Boolean ).Val == ( Second as Boolean ).Val );
-				else return new NoValue();
-			} else return new NoValue();
+				else return NoValue.Value;
+			} else return NoValue.Value;
 		}
 	}
 	class LessThan : Operator
@@ -454,8 +526,10 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number ) return new Boolean( ( First as Number ).Val < ( Second as Number ).Val );
-			else return new NoValue();
+			else return NoValue.Value;
 		}
 	}
 	class LessOrEqual : Operator
@@ -465,8 +539,10 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number ) return new Boolean( ( First as Number ).Val <= ( Second as Number ).Val );
-			else return new NoValue();
+			else return NoValue.Value;
 		}
 	}
 	class GreaterThan : Operator
@@ -476,8 +552,10 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number ) return new Boolean( ( First as Number ).Val > ( Second as Number ).Val );
-			else return new NoValue();
+			else return NoValue.Value;
 		}
 	}
 	class GreaterOrEqual : Operator
@@ -487,8 +565,10 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
 			if ( First is Number && Second is Number ) return new Boolean( ( First as Number ).Val >= ( Second as Number ).Val );
-			else return new NoValue();
+			else return NoValue.Value;
 		}
 	}
 
@@ -500,7 +580,7 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( First is Boolean && Second is Boolean ) return new Boolean( ( First as Boolean ).Val || ( Second as Boolean ).Val );
-			else return new NoValue();
+			else return NoValue.Value;
 		}
 	}
 	class LogicalAnd : Operator
@@ -511,7 +591,7 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( First is Boolean && Second is Boolean ) return new Boolean( ( First as Boolean ).Val && ( Second as Boolean ).Val );
-			else return new NoValue();
+			else return NoValue.Value;
 		}
 	}
 
@@ -522,7 +602,12 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			var eFirst = First.Evaluate();
+			if ( First is Identifier && eFirst is Number )
+			{
+				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val + 1 ) );
+				return First.Evaluate();
+			} else return NoValue.Value;
 		}
 	}
 	class SufixDecrement : Operator, IRequiresRuntime
@@ -532,7 +617,12 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			var eFirst = First.Evaluate();
+			if ( First is Identifier && eFirst is Number )
+			{
+				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val - 1 ) );
+				return First.Evaluate();
+			} else return NoValue.Value;
 		}
 	}
 	class PrefixIncrement : Operator, IRequiresRuntime
@@ -542,7 +632,12 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			var eFirst = First.Evaluate();
+			if ( First is Identifier && eFirst is Number )
+			{
+				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val + 1 ) );
+				return First.Evaluate();
+			} else return NoValue.Value;
 		}
 	}
 	class PrefixDecrement : Operator, IRequiresRuntime
@@ -552,7 +647,12 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			var eFirst = First.Evaluate();
+			if ( First is Identifier && eFirst is Number )
+			{
+				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val - 1 ) );
+				return First.Evaluate();
+			} else return NoValue.Value;
 		}
 	}
 
@@ -563,7 +663,7 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			return NoValue.Value;
 		}
 	}
 
@@ -575,11 +675,11 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			First = First.Evaluate();
-			if ( First is Boolean && ( Second is CodeBlock ) )
+			if ( First is Boolean && Second is CodeBlock )
 			{
 				if ( ( First as Boolean ).Val ) return ( Second as CodeBlock ).Run();
 				else return new ConditionNotMet();
-			} else return new NoValue();
+			} else return NoValue.Value;
 		}
 	}
 	class ElseOperator : Operator, IRequiresRuntime
@@ -590,7 +690,28 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( First is ConditionNotMet ) return ( Second as CodeBlock ).Run();
-			else return new NoValue();
+			else return NoValue.Value;
+		}
+	}
+	class WhileOperator : Operator
+	{
+		public WhileOperator ()
+			: base( 15, OperatorType.PrefixBinary ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
+			if ( First is CodeBlock && Second is CodeBlock )
+			{
+				CodeBlock block = ( Second as CodeBlock );
+				block.Value.AddRange( ( First as CodeBlock ).Value );
+				block.Value.Add( new CodeBlock( new Token[] { new ContinueOperator() }.ToList() ) );
+				block.Value.Add( new IfOperator() );
+				block.Value.Add( new CodeBlock( new Token[] { new BreakOperator() }.ToList() ) );
+				block.Value.Add( new ElseOperator() );
+				return new Loop( block );
+			} else return NoValue.Value;
 		}
 	}
 	class FunctionOperator : Operator
@@ -606,11 +727,43 @@ namespace Kento
 			CodeBlock code;
 			if ( First is String ) arr = First.ToArray();
 			else if ( First is Array ) arr = ( First as Array );
-			else return new NoValue();
+			else return NoValue.Value;
 			if ( Second is CodeBlock ) code = ( Second as CodeBlock );
-			else return new NoValue();
+			else return NoValue.Value;
 
 			return new Function( arr, code );
+		}
+	}
+	class ClassOperator : Operator, IRequiresRuntime
+	{
+		public ClassOperator ()
+			: base( 14, OperatorType.PrefixBinary ) { }
+		public override Value Operate ( Value First, Value Second )
+		{
+			First = First.Evaluate();
+			Second = Second.Evaluate();
+			if ( First is Array && ( First as Array ).Arr.Count == 0 && Second is CodeBlock )
+			{
+				var newType = new Type( ( Second as CodeBlock ) );
+				return newType.Run();
+			} else if ( First is Type && Second is CodeBlock )
+			{
+				var newType = new Type( ( First as Type ), ( Second as CodeBlock ) );
+				return newType.Run();
+			} else return NoValue.Value;
+		}
+	}
+	class NewOperator : Operator, IRequiresRuntime
+	{
+		public NewOperator ()
+			: base( 4, OperatorType.PrefixUnary ) { }
+		public override Value Operate ( Value First, Value Second )
+		{
+			First = First.Evaluate();
+			if ( First is Type )
+			{
+				return new Instance( ( First as Type ) );
+			} else return NoValue.Value;
 		}
 	}
 
@@ -635,7 +788,58 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return new NoValue();
+			First = First.Evaluate();
+			if ( First is Instance && Second is Identifier )
+			{
+				Compiler.SetAsCurrentScope( ( First as Instance ).Identifiers );
+				Compiler.InInstanceScope = true;
+				return Second;
+			} else return NoValue.Value;
+		}
+	}
+
+	class ReturnOperator : Operator, IRequiresRuntime
+	{
+		public ReturnOperator ()
+			: base( 15, OperatorType.PrefixUnary ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			return NoValue.Value;
+		}
+	}
+	class ContinueOperator : Operator, IRequiresRuntime
+	{
+		public ContinueOperator ()
+			: base( 15, OperatorType.Special ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			return NoValue.Value;
+		}
+	}
+	class BreakOperator : Operator, IRequiresRuntime
+	{
+		public BreakOperator ()
+			: base( 15, OperatorType.Special ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			return NoValue.Value;
+		}
+	}
+
+	class RunCodeBlock : Operator, IRequiresRuntime
+	{
+		public RunCodeBlock ()
+			: base( 0, OperatorType.SufixUnary ) { }
+		public override Value Operate ( Value First, Value Second )
+		{
+			First = First.Evaluate();
+			if ( First is CodeBlock )
+			{
+				return ( First as CodeBlock ).Run();
+			} else return NoValue.Value;
 		}
 	}
 }

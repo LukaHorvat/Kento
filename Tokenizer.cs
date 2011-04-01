@@ -100,7 +100,7 @@ namespace Kento
 				alreadyDone.Add( inQuote );
 			}
 
-			var operatorList = Operators.OperatorDictionary.Keys.ToList();
+			var operatorList = Operators.RepresentationDictionary.Values.ToList();
 			operatorList.Sort( new Comparison<string>( compare ) );
 			for ( int i = 0 ; i < operatorList.Count ; ++i )
 			{
@@ -138,7 +138,7 @@ namespace Kento
 		/// <returns></returns>
 		static ParseState getCharType ( char C )
 		{
-			if ( C >= 'A' && C <= 'z' || C == '"' || C == ' ' )
+			if ( ( C >= 'A' && C <= 'Z' ) || ( C >= 'a' && C <= 'z' ) || C == '"' || C == ' ' )
 			{
 				return ParseState.Letters;
 			} else if ( C >= '0' && C <= '9' )

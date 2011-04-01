@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kento
 {
-	abstract class Value : Token
+	public abstract class Value : Token
 	{
 		public virtual Value Evaluate ()
 		{
@@ -15,6 +15,34 @@ namespace Kento
 		{
 			return new Array( this );
 		}
-		public abstract List<Token> Tokenize ();
+		public virtual List<Token> Tokenize ()
+		{
+			return new List<Token>( new Token[] { (Token)this } );
+		}
+		public virtual Value Clone ()
+		{
+			return this;
+		}
+	}
+	class NoValue : Value
+	{
+		static NoValue noValue = new NoValue();
+		public static NoValue Value
+		{
+			get { return NoValue.noValue; }
+			set { NoValue.noValue = value; }
+		}
+		public override Value Evaluate ()
+		{
+			return NoValue.Value;
+		}
+		public override List<Token> Tokenize ()
+		{
+			return new List<Token>( new Token[] { (Token)this } );
+		}
+		public override Value Clone ()
+		{
+			return Value;
+		}
 	}
 }

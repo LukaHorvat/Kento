@@ -7,13 +7,22 @@ using System.Diagnostics;
 
 namespace Kento
 {
+	enum FallThroughType
+	{
+		Break = 0,
+		Continue,
+		Return,
+		NoFallthrough
+	}
+
 	class Compiler
 	{
-		static float lastRunningTime;
-		public static float LastRunningTime
+		static Stopwatch timer;
+
+		static float runningTime;
+		public static float RunningTime
 		{
-			get { return Compiler.lastRunningTime; }
-			set { Compiler.lastRunningTime = value; }
+			get { return timer.ElapsedTicks / (float)Stopwatch.Frequency * 1000; }
 		}
 
 		static bool runtime;
@@ -23,22 +32,81 @@ namespace Kento
 			set { Compiler.runtime = value; }
 		}
 
-		static Stack<CodeBlock> scopeStack = new Stack<CodeBlock>();
-		public static CodeBlock ExecutingScope
+		static LinkedList<Dictionary<string, Value>> scopeList = new LinkedList<Dictionary<string, Value>>();
+
+		static FallThroughType fallthrough = FallThroughType.NoFallthrough;
+		public static FallThroughType Fallthrough
 		{
-			get
+			get { return Compiler.fallthrough; }
+			set { Compiler.fallthrough = value; }
+		}
+
+		static bool inInstanceScope;
+		static public bool InInstanceScope
+		{
+			get { return inInstanceScope; }
+			set { inInstanceScope = value; }
+		}
+
+		public static Value GetValue ( string Name )
+		{
+			Value result = NoValue.Value;
+			for ( var node = scopeList.Last ; node != null ; node = node.Previous )
 			{
-				if ( Compiler.scopeStack.Count > 0 ) return Compiler.scopeStack.Peek();
-				else return null;
+				if ( node.Value.ContainsKey( Name ) )
+				{
+					result = node.Value[ Name ];
+					break;
+				}
 			}
-			set { Compiler.scopeStack.Push( value ); }
+			return result;
+		}
+		public static Value GetValue ( Identifier Identifier )
+		{
+			return GetValue( Identifier.Name );
+		}
+		public static void SetValue ( string Name, Value Value )
+		{
+			for ( var node = scopeList.Last ; node != null ; node = node.Previous )
+			{
+				if ( node.Value.ContainsKey( Name ) )
+				{
+					node.Value[ Name ] = Value;
+					return;
+				}
+			}
+			scopeList.Last.Value[ Name ] = Value;
+		}
+		public static void SetValue ( Identifier Identifier, Value Value )
+		{
+			SetValue( Identifier.Name, Value );
+		}
+		public static void MakeValueInCurrentScope ( string Name, Value Value )
+		{
+			scopeList.Last.Value[ Name ] = Value;
+		}
+		public static void MakeValueInCurrentScope ( Identifier Identifier, Value Value )
+		{
+			MakeValueInCurrentScope( Identifier.Name, Value );
+		}
+		public static void SetAsCurrentScope ( Dictionary<string, Value> Scope )
+		{
+			scopeList.AddLast( Scope );
+		}
+		public static void EnterScope ()
+		{
+			scopeList.AddLast( new Dictionary<string, Value>() );
 		}
 		public static void ExitScope ()
 		{
-			var last = scopeStack.Pop();
-			foreach ( var pair in last.Identifiers )
+			scopeList.RemoveLast();
+		}
+		public static void ExitInstanceScope ()
+		{
+			if ( inInstanceScope )
 			{
-				if ( scopeStack.Peek().Identifiers.ContainsKey( pair.Key ) ) scopeStack.Peek().Identifiers[ pair.Key ] = pair.Value;
+				scopeList.RemoveLast();
+				inInstanceScope = false;
 			}
 		}
 		public static void Run ( string Code )
@@ -47,22 +115,15 @@ namespace Kento
 		}
 		public static void Run ( List<Token> Code )
 		{
-			CodeBlock defaultScope = new CodeBlock( new List<Token>() );
-			defaultScope.Identifiers = Compiler.LoadStandardLibrary();
-			scopeStack.Push( defaultScope );
+			var defaultScope = Compiler.LoadStandardLibrary();
+			scopeList.AddLast( defaultScope );
 
 			runtime = true;
-			Stopwatch timer = new Stopwatch(); timer.Start();
+			timer = new Stopwatch(); timer.Start();
 
-			if ( Code[ 0 ] is CodeBlock )
-			{
-				( Code[ 0 ] as CodeBlock ).Run();
-			} else
-			{
-				new CodeBlock( Code ).Run();
-			}
+			new CodeBlock( Code ).Run();
 
-			timer.Stop(); lastRunningTime = timer.ElapsedTicks / (float)Stopwatch.Frequency * 1000;
+			timer.Stop();
 		}
 		public static Dictionary<string, Value> LoadStandardLibrary ()
 		{

@@ -29,5 +29,9 @@ namespace Kento
 		{
 			return new List<Token>( new Token[] { (Token)this } );
 		}
+		public override Value Clone ()
+		{
+			return new String( value );
+		}
 	}
 }

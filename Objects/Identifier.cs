@@ -24,12 +24,12 @@ namespace Kento
 		}
 		public override Value Evaluate ()
 		{
-			if ( Compiler.Runtime && Compiler.ExecutingScope.Identifiers.ContainsKey( name ) )
+			if ( Compiler.Runtime )
 			{
-				return Compiler.ExecutingScope.Identifiers[ Name ].Evaluate();
+				return Compiler.GetValue( this );
 			} else
 			{
-				return new NoValue();
+				return NoValue.Value;
 			}
 		}
 		public override List<Token> Tokenize ()

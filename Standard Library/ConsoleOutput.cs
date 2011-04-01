@@ -16,7 +16,7 @@ namespace Kento
 				Console.Write( val.ToString() );
 			}
 			Console.WriteLine();
-			return new NoValue();
+			return NoValue.Value;
 		}
 	}
 }

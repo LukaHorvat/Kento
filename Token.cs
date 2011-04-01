@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kento
 {
-	abstract class Token
+	public abstract class Token
 	{
 
 	}

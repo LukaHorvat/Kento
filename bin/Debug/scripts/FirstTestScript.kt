@@ -1,49 +1,24 @@
-evenOdd = function ("num") {
-	if (num % 2 == 0) {
-		ConsoleOutput("Even")
-	}else {
-		ConsoleOutput("Odd")
+Animal = class () {
+	Live = function () {
+		ConsoleOutput("The animal called " + Name + " lives")
 	}
 }
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
-evenOdd(201)
+Fish = class Animal {
+	Name = "Goldy" 
+	Swim = function () {
+		ConsoleOutput("The fish swims")
+	}
+}
+Bird = class Animal {
+	Name = "Tweety"
+	Fly = function () {
+		ConsoleOutput("The bird flies")
+	}
+}
+bird = new Bird
+fish = new Fish
+
+bird.Live()
+fish.Live()
+bird.Fly()
+fish.Swim()

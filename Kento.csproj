@@ -42,17 +42,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExpressionSequence.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Objects\ExpressionSequence.cs" />
     <Compile Include="IRequiresRuntime.cs" />
     <Compile Include="Objects\Array.cs" />
     <Compile Include="Objects\Boolean.cs" />
     <Compile Include="Compiler.cs" />
-    <Compile Include="Expression.cs" />
+    <Compile Include="Objects\Expression.cs" />
     <Compile Include="Objects\Class.cs" />
     <Compile Include="Objects\CodeBlock.cs" />
     <Compile Include="Objects\Function.cs" />
     <Compile Include="Objects\Identifier.cs" />
+    <Compile Include="Objects\Instance.cs" />
     <Compile Include="Objects\Literal.cs" />
+    <Compile Include="Objects\Loop.cs" />
     <Compile Include="Objects\Number.cs" />
     <Compile Include="Objects\Type.cs" />
     <Compile Include="Operators.cs" />
@@ -62,19 +65,22 @@
     <Compile Include="Standard Library\ConsoleInput.cs" />
     <Compile Include="Standard Library\ConsoleOutput.cs" />
     <Compile Include="Standard Library\ExternalFunction.cs" />
+    <Compile Include="Standard Library\GetExecutionTime.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="TokenList.cs" />
     <Compile Include="TokenListNode.cs" />
     <Compile Include="Value.cs" />
-    <Compile Include="Variable.cs" />
+    <Compile Include="Objects\Variable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="bin\Debug\scripts\FirstTestScript.kt" />
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -6,6 +6,12 @@ using System.Diagnostics;
 
 namespace Kento
 {
+	enum CodeBlockType
+	{
+		Function = 0,
+		Loop,
+		Other
+	}
 	class CodeBlock : Value
 	{
 		List<Token> value;
@@ -15,22 +21,20 @@ namespace Kento
 			set { this.value = value; }
 		}
 
-		Dictionary<string, Value> identifiers;
-		public Dictionary<string, Value> Identifiers
+		CodeBlockType type = CodeBlockType.Other;
+		public CodeBlockType Type
 		{
-			get { return identifiers; }
-			set { identifiers = value; }
+			get { return type; }
+			set { type = value; }
 		}
 
 		public CodeBlock ( Expression Code )
 		{
 			value = Code.Tokenize();
-			identifiers = new Dictionary<string, Value>();
 		}
 		public CodeBlock ( List<Token> Code )
 		{
 			value = Code;
-			identifiers = new Dictionary<string, Value>();
 		}
 
 		public override Value Evaluate ()
@@ -38,29 +42,34 @@ namespace Kento
 			return this;
 		}
 
-		public Value Run ()
+		public virtual Value Run ()
 		{
-			if ( Compiler.ExecutingScope != null )
+			if ( this is Function == false && this is Type == false )
 			{
-				foreach ( var pair in Compiler.ExecutingScope.Identifiers )
-				{
-					if ( !identifiers.ContainsKey( pair.Key ) ) identifiers[ pair.Key ] = pair.Value;
-				}
+				Compiler.EnterScope();
 			}
-			Compiler.ExecutingScope = this;
-
 			Stack<Token> solvingStack = new Stack<Token>();
 			for ( int i = 0 ; i < value.Count ; ++i )
 			{
 				if ( value[ i ] is Operator )
 				{
 					Operator op = (Operator)value[ i ];
-					if ( op.Type == OperatorType.PrefixUnary || op.Type == OperatorType.SufixUnary )
+					if ( op is ReturnOperator )
 					{
-						op.Operate( ( solvingStack.Pop() as Value ), new NoValue() );
+						Compiler.Fallthrough = FallThroughType.Return;
+					} else if ( op is ContinueOperator )
+					{
+						Compiler.Fallthrough = FallThroughType.Continue;
+					} else if ( op is BreakOperator )
+					{
+						Compiler.Fallthrough = FallThroughType.Break;
 					} else
 					{
-						Value second = (Value)solvingStack.Pop();
+						Value second = NoValue.Value;
+						if ( op.Type != OperatorType.PrefixUnary && op.Type != OperatorType.SufixUnary )
+						{
+							second = (Value)solvingStack.Pop();
+						}
 						Value result = op.Operate( ( solvingStack.Pop() as Value ), second );
 						solvingStack.Push( result );
 					}
@@ -68,15 +77,35 @@ namespace Kento
 				{
 					solvingStack.Push( value[ i ] );
 				}
+				if ( Compiler.Fallthrough != FallThroughType.NoFallthrough )
+				{
+					if ( type == CodeBlockType.Function && Compiler.Fallthrough == FallThroughType.Return )
+					{
+						Compiler.Fallthrough = FallThroughType.NoFallthrough;
+						break;
+					} else if ( type == CodeBlockType.Loop )
+					{
+						if ( Compiler.Fallthrough == FallThroughType.Continue )
+						{
+							Compiler.Fallthrough = FallThroughType.NoFallthrough;
+							i = -1;
+							solvingStack.Clear();
+							continue;
+						} else if ( Compiler.Fallthrough == FallThroughType.Break )
+						{
+							Compiler.Fallthrough = FallThroughType.NoFallthrough;
+							break;
+						}
+					} else
+					{
+						break;
+					}
+				}
 			}
+			Value toReturn = NoValue.Value;
+			if ( solvingStack.Count > 0 ) toReturn = ( solvingStack.Peek() as Value ).Evaluate();
 			Compiler.ExitScope();
-			if ( solvingStack.Count == 0 ) return new NoValue();
-			else return (Value)solvingStack.Peek();
-		}
-
-		public override List<Token> Tokenize ()
-		{
-			return value;
+			return toReturn;
 		}
 	}
 }

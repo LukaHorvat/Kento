@@ -10,12 +10,16 @@ namespace Kento
 	{
 		static void Main ( string[] args )
 		{
-			System.Threading.Thread.Sleep( 1000 );
-			using ( StreamReader reader = new StreamReader( @"scripts\FirstTestScript.kt" ) )
+			if ( args.Length == 0 )
+			{
+				Console.WriteLine( "Please provide the path to the source code as a command-line argument" );
+				Console.ReadKey();
+				return;
+			}
+			using ( StreamReader reader = new StreamReader( args[ 0 ] ) )
 			{
 				Compiler.Run( reader.ReadToEnd() );
 			}
-			Console.WriteLine( Compiler.LastRunningTime );
 			Console.ReadKey();
 		}
 	}
