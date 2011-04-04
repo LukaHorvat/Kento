@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Kento
+﻿namespace Kento
 {
 	class ArrayIdentifier : Identifier
 	{
@@ -26,7 +21,7 @@ namespace Kento
 		{
 			if ( index >= 0 && index < arrayReference.Arr.Count )
 			{
-				return arrayReference.Arr[ index ];
+				return arrayReference.Arr[ index ].Evaluate();
 			} else return NoValue.Value;
 		}
 	}

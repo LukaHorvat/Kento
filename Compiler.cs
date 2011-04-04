@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace Kento
 {
@@ -19,7 +18,6 @@ namespace Kento
 	{
 		static Stopwatch timer;
 
-		static float runningTime;
 		public static float RunningTime
 		{
 			get { return timer.ElapsedTicks / (float)Stopwatch.Frequency * 1000; }
@@ -28,91 +26,107 @@ namespace Kento
 		static bool runtime;
 		public static bool Runtime
 		{
-			get { return Compiler.runtime; }
-			set { Compiler.runtime = value; }
+			get { return runtime; }
+			set { runtime = value; }
 		}
 
-		static LinkedList<Dictionary<string, Value>> scopeList = new LinkedList<Dictionary<string, Value>>();
+		static readonly LinkedList<Dictionary<string, Reference>> scopeList = new LinkedList<Dictionary<string, Reference>>();
+
+		static readonly List<Value> memory = new List<Value>();
+		static readonly Stack<int> availabilityStack = new Stack<int>();
 
 		static FallThroughType fallthrough = FallThroughType.NoFallthrough;
 		public static FallThroughType Fallthrough
 		{
-			get { return Compiler.fallthrough; }
-			set { Compiler.fallthrough = value; }
+			get { return fallthrough; }
+			set { fallthrough = value; }
 		}
 
-		static Stack<int> instanceScopes = new Stack<int>();
-
-		public static Value GetValue ( string Name )
+		public static Value GetValue ( int Index )
 		{
 			Value result = NoValue.Value;
-			for ( var node = scopeList.Last ; node != null ; node = node.Previous )
+			if ( Index < memory.Count && Index >= 0 )
 			{
-				if ( node.Value.ContainsKey( Name ) )
-				{
-					result = node.Value[ Name ];
-					break;
-				}
+				result = memory[ Index ];
 			}
-			if ( result is Identifier ) result = GetValue( result as Identifier );
 			return result;
 		}
-		public static Value GetValue ( Identifier Identifier )
+		public static void SetValue ( int Index, Value Value )
 		{
-			return GetValue( Identifier.Name );
+			if ( Index < memory.Count && Index > 0 ) memory[ Index ] = Value;
 		}
-		public static void SetValue ( string Name, Value Value )
+		public static Reference Identify ( string Name )
 		{
+			for ( var node = scopeList.Last ; node != null ; node = node.Previous )
+			{
+				if ( node.Value.ContainsKey( Name ) ) return node.Value[ Name ];
+			}
+			return NullReference.Value;
+		}
+		public static void SetAlias ( string Name, Reference Reference )
+		{
+			bool set = false;
 			for ( var node = scopeList.Last ; node != null ; node = node.Previous )
 			{
 				if ( node.Value.ContainsKey( Name ) )
 				{
-					node.Value[ Name ] = Value;
-					return;
+					node.Value[ Name ] = Reference;
+					set = true;
 				}
 			}
-			scopeList.Last.Value[ Name ] = Value;
+			if ( !set ) scopeList.Last.Value[ Name ] = Reference;
 		}
-		public static void SetValue ( Identifier Identifier, Value Value )
+		public static void SetAliasInCurrentScope ( string Name, Reference Reference )
 		{
-			if ( Identifier is ArrayIdentifier ) ( Identifier as ArrayIdentifier ).SetValue( Value );
-			else SetValue( Identifier.Name, Value );
+			scopeList.Last.Value[ Name ] = Reference;
+
 		}
-		public static void MakeValueInCurrentScope ( string Name, Value Value )
+		public static void SetAlias ( string Name, int Index )
 		{
-			scopeList.Last.Value[ Name ] = Value;
+			SetAlias( Name, new Reference( Index ) );
 		}
-		public static void MakeValueInCurrentScope ( Identifier Identifier, Value Value )
+		public static void SetAliasInCurrentScope ( string Name, int Index )
 		{
-			MakeValueInCurrentScope( Identifier.Name, Value );
+			SetAliasInCurrentScope( Name, new Reference( Index ) );
 		}
-		public static void SetAsCurrentScope ( Dictionary<string, Value> Scope )
+		public static void SetAsCurrentScope ( Dictionary<string, Reference> Scope )
 		{
 			scopeList.AddLast( Scope );
 		}
 		public static void EnterScope ()
 		{
-			scopeList.AddLast( new Dictionary<string, Value>() );
+			scopeList.AddLast( new Dictionary<string, Reference>() );
 		}
-		public static void ExitScope ()
+		public static void ExitScope ( bool DoNotDestroy = false )
 		{
-			scopeList.RemoveLast();
-		}
-		public static void EnterInstanceScope ( Instance Instance )
-		{
-			scopeList.AddLast( Instance.Identifiers );
-			instanceScopes.Push( scopeList.Count );
-		}
-		public static void ExitInstanceScope ()
-		{
-			if ( instanceScopes.Count > 0 )
+			if ( !DoNotDestroy )
 			{
-				if ( instanceScopes.Peek() == scopeList.Count )
+				var scope = scopeList.Last.Value;
+				foreach ( var pair in scope )
 				{
-					scopeList.RemoveLast();
-					instanceScopes.Pop();
+					pair.Value.ReferencingValue = null;
+
 				}
 			}
+			scopeList.RemoveLast();
+		}
+		public static int StoreValue ( Value Value )
+		{
+
+			var foundIndex = memory.IndexOf( Value );
+			if ( foundIndex != -1 ) return foundIndex;
+
+			int index;
+			if ( availabilityStack.Count > 0 )
+			{
+				index = availabilityStack.Pop();
+				memory[ index ] = Value;
+			} else
+			{
+				index = memory.Count;
+				memory.Add( Value );
+			}
+			return index;
 		}
 		public static void Run ( string Code )
 		{
@@ -130,16 +144,16 @@ namespace Kento
 
 			timer.Stop();
 		}
-		public static Dictionary<string, Value> LoadStandardLibrary ()
+		public static Dictionary<string, Reference> LoadStandardLibrary ()
 		{
-			var lib = new Dictionary<string, Value>();
+			var lib = new Dictionary<string, Reference>();
 			var asm = Assembly.GetExecutingAssembly();
 			var externalFunctions = asm.GetTypes().Where( x => x.IsSubclassOf( typeof( ExternalFunction ) ) );
 
 			foreach ( System.Type fn in externalFunctions )
 			{
 				ExternalFunction instance = ( Activator.CreateInstance( fn ) as ExternalFunction );
-				lib[ instance.Representation ] = instance;
+				lib[ instance.Representation ] = new Reference( instance );
 			}
 
 			return lib;

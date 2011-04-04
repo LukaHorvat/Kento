@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Kento
 {
 	public static class ExtensionMethods
 	{
-		public static Dictionary<string, Value> Clone ( this Dictionary<string, Value> Original )
+		public static Dictionary<string, Reference> Clone ( this Dictionary<string, Reference> Original )
 		{
-			var newDict = new Dictionary<string, Value>();
+			var newDict = new Dictionary<string, Reference>();
 			foreach ( var pair in Original )
 			{
-				newDict[ pair.Key ] = pair.Value.Clone();
+				newDict[ pair.Key ] = ( pair.Value.Clone() as Reference );
 			}
 			return newDict;
 		}

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 
 namespace Kento
 {
@@ -104,7 +100,7 @@ namespace Kento
 			}
 			Value toReturn = NoValue.Value;
 			if ( solvingStack.Count > 0 ) toReturn = ( solvingStack.Peek() as Value ).Evaluate();
-			Compiler.ExitScope();
+			Compiler.ExitScope( this is Type );
 			return toReturn;
 		}
 	}

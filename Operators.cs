@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Diagnostics;
 
 namespace Kento
 {
@@ -155,7 +153,7 @@ namespace Kento
 			representationDictionary.Add( typeof( MakeCodeBlock ), "makeCB!" );
 			representationDictionary.Add( typeof( AccessValueAtIndex ), "index!" );
 
-			lowestPrecedance = representationDictionary.Keys.Max( x => ( Activator.CreateInstance( x ) as Operator ).Precedance );
+			lowestPrecedance = representationDictionary.Keys.Max( X => ( (Operator) Activator.CreateInstance( X ) ).Precedance );
 
 			brackets.AddLast( new BracketType( typeof( CurlyBracesOpen ), typeof( CurlyBracesClosed ), typeof( MakeCodeBlock ) ) );
 			brackets.AddLast( new BracketType( typeof( SquareBracketsOpen ), typeof( SquareBracketsClosed ), typeof( AccessValueAtIndex ) ) );
@@ -178,11 +176,14 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val - ( Second as Number ).Val ) );
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val - ( Second as Number ).Val ) )
+					);
 				var toReturn = First.Evaluate();
-				Compiler.ExitInstanceScope();
 				return toReturn;
-			} else return NoValue.Value;
+			}
+			return NoValue.Value;
 		}
 	}
 	class DivisiveAssignment : Operator, IRequiresRuntime
@@ -196,11 +197,14 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val / ( Second as Number ).Val ) );
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val / ( Second as Number ).Val ) )
+					);
 				var toReturn = First.Evaluate();
-				Compiler.ExitInstanceScope();
 				return toReturn;
-			} else return NoValue.Value;
+			}
+			return NoValue.Value;
 		}
 	}
 	class MultiplicativeAssignment : Operator, IRequiresRuntime
@@ -214,11 +218,13 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val * ( Second as Number ).Val ) );
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val * ( Second as Number ).Val ) )
+					);
 				var toReturn = First.Evaluate();
-				Compiler.ExitInstanceScope();
 				return toReturn;
-			} else return NoValue.Value;
+			} return NoValue.Value;
 		}
 	}
 	class AdditiveAssignment : Operator, IRequiresRuntime
@@ -232,11 +238,13 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val + ( Second as Number ).Val ) );
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val + ( Second as Number ).Val ) )
+					);
 				var toReturn = First.Evaluate();
-				Compiler.ExitInstanceScope();
 				return toReturn;
-			} else return NoValue.Value;
+			} return NoValue.Value;
 		}
 	}
 	class ModAssignment : Operator, IRequiresRuntime
@@ -250,11 +258,13 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier && eFirst is Number && Second is Number )
 			{
-				Compiler.SetValue( First as Identifier, new Number( ( eFirst as Number ).Val % ( Second as Number ).Val ) );
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val % ( Second as Number ).Val ) )
+					);
 				var toReturn = First.Evaluate();
-				Compiler.ExitInstanceScope();
 				return toReturn;
-			} else return NoValue.Value;
+			} return NoValue.Value;
 		}
 	}
 	class ReferenceAssignment : Operator, IRequiresRuntime
@@ -266,26 +276,13 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier )
 			{
-				if ( Second is Reference )
-				{
-					Compiler.SetValue( First as Identifier, ( Second as Reference ).ReferencingValue );
-					var toReturn = First.Evaluate();
-					Compiler.ExitInstanceScope();
-					return toReturn;
-				} else if ( Second != NoValue.Value )
-				{
-					Compiler.SetValue( First as Identifier, new Reference( Second ) );
-					var toReturn = First.Evaluate();
-					Compiler.ExitInstanceScope();
-					return toReturn;
-				} else
-				{
-					Compiler.SetValue( First as Identifier, NoValue.Value );
-					var toReturn = First.Evaluate();
-					Compiler.ExitInstanceScope();
-					return toReturn;
-				}
-			} else return NoValue.Value;
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( Second )
+					);
+				var toReturn = First.Evaluate();
+				return toReturn;
+			} return NoValue.Value;
 		}
 	}
 	class Assignment : Operator, IRequiresRuntime
@@ -298,11 +295,13 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Identifier )
 			{
-				Compiler.SetValue( First as Identifier, Second );
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( Second.Clone() )
+					);
 				var toReturn = First.Evaluate();
-				Compiler.ExitInstanceScope();
 				return toReturn;
-			} else return NoValue.Value;
+			} return NoValue.Value;
 		}
 	}
 
@@ -460,7 +459,6 @@ namespace Kento
 			if ( eFirst is Function )
 			{
 				var toReturn = ( eFirst as Function ).Invoke( eSecond );
-				Compiler.ExitInstanceScope();
 				return toReturn;
 			} else return NoValue.Value;
 		}
@@ -528,7 +526,7 @@ namespace Kento
 			} else return NoValue.Value;
 		}
 	}
-	class TypeofOperator:Operator, IRequiresRuntime
+	class TypeofOperator : Operator, IRequiresRuntime
 	{
 		public TypeofOperator ()
 			: base( 2, OperatorType.PrefixUnary ) { }
@@ -661,9 +659,13 @@ namespace Kento
 			var eFirst = First.Evaluate();
 			if ( First is Identifier && eFirst is Number )
 			{
-				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val + 1 ) );
-				return First.Evaluate();
-			} else return NoValue.Value;
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val + 1 ) )
+					);
+				var toReturn = First.Evaluate();
+				return toReturn;
+			} return NoValue.Value;
 		}
 	}
 	class SufixDecrement : Operator, IRequiresRuntime
@@ -676,9 +678,13 @@ namespace Kento
 			var eFirst = First.Evaluate();
 			if ( First is Identifier && eFirst is Number )
 			{
-				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val - 1 ) );
-				return First.Evaluate();
-			} else return NoValue.Value;
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val - 1 ) )
+					);
+				var toReturn = First.Evaluate();
+				return toReturn;
+			} return NoValue.Value;
 		}
 	}
 	class PrefixIncrement : Operator, IRequiresRuntime
@@ -691,9 +697,13 @@ namespace Kento
 			var eFirst = First.Evaluate();
 			if ( First is Identifier && eFirst is Number )
 			{
-				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val + 1 ) );
-				return First.Evaluate();
-			} else return NoValue.Value;
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val + 1 ) )
+					);
+				var toReturn = First.Evaluate();
+				return toReturn;
+			} return NoValue.Value;
 		}
 	}
 	class PrefixDecrement : Operator, IRequiresRuntime
@@ -706,9 +716,13 @@ namespace Kento
 			var eFirst = First.Evaluate();
 			if ( First is Identifier && eFirst is Number )
 			{
-				Compiler.SetValue( ( First as Identifier ), new Number( ( eFirst as Number ).Val - 1 ) );
-				return First.Evaluate();
-			} else return NoValue.Value;
+				Compiler.SetAlias(
+					( First as Identifier ).Name,
+					new Reference( new Number( ( eFirst as Number ).Val - 1 ) )
+					);
+				var toReturn = First.Evaluate();
+				return toReturn;
+			} return NoValue.Value;
 		}
 	}
 
@@ -758,7 +772,7 @@ namespace Kento
 		{
 			First = First.Evaluate();
 			Second = Second.Evaluate();
-			if ( First is Expression ) First = new CodeBlock( First as Expression);
+			if ( First is Expression ) First = new CodeBlock( First as Expression );
 			if ( First is CodeBlock && Second is CodeBlock )
 			{
 				CodeBlock block = ( Second as CodeBlock );
@@ -848,8 +862,12 @@ namespace Kento
 			First = First.Evaluate();
 			if ( First is Instance && Second is Identifier )
 			{
-				Compiler.EnterInstanceScope( ( First as Instance ) );
-				return Second;
+				Instance inst = First as Instance;
+				Identifier ident = Second as Identifier;
+				if ( inst.Identifiers.ContainsKey( ident.Name ) )
+				{
+					return ( First as Instance ).Identifiers[ ( Second as Identifier ).Name ];
+				} else return NoValue.Value;
 			} else return NoValue.Value;
 		}
 	}

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Kento
 {
 	class Type : CodeBlock
 	{
-		Dictionary<string, Value> identifiers;
-		public Dictionary<string, Value> Identifiers
+		Dictionary<string, Reference> identifiers;
+		public Dictionary<string, Reference> Identifiers
 		{
 			get { return identifiers; }
 			set { identifiers = value; }
@@ -22,7 +19,7 @@ namespace Kento
 		public Type ( CodeBlock Code )
 			: base( Code.Value )
 		{
-			identifiers = new Dictionary<string, Value>();
+			identifiers = new Dictionary<string, Reference>();
 		}
 
 		public override Value Run ()

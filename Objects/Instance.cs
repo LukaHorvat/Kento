@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Kento
 {
 	class Instance : Value
 	{
-		Dictionary<string, Value> identifiers;
-		public Dictionary<string, Value> Identifiers
+		Dictionary<string, Reference> identifiers;
+		public Dictionary<string, Reference> Identifiers
 		{
 			get { return identifiers; }
 			set { identifiers = value; }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Kento
 {
@@ -26,7 +23,7 @@ namespace Kento
 		{
 			if ( Compiler.Runtime )
 			{
-				return Compiler.GetValue( this );
+				return Compiler.Identify( Name );
 			} else
 			{
 				return NoValue.Value;
