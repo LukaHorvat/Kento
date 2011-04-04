@@ -41,12 +41,7 @@ namespace Kento
 			set { Compiler.fallthrough = value; }
 		}
 
-		static bool inInstanceScope;
-		static public bool InInstanceScope
-		{
-			get { return inInstanceScope; }
-			set { inInstanceScope = value; }
-		}
+		static Stack<int> instanceScopes = new Stack<int>();
 
 		public static Value GetValue ( string Name )
 		{
@@ -59,6 +54,7 @@ namespace Kento
 					break;
 				}
 			}
+			if ( result is Identifier ) result = GetValue( result as Identifier );
 			return result;
 		}
 		public static Value GetValue ( Identifier Identifier )
@@ -79,7 +75,8 @@ namespace Kento
 		}
 		public static void SetValue ( Identifier Identifier, Value Value )
 		{
-			SetValue( Identifier.Name, Value );
+			if ( Identifier is ArrayIdentifier ) ( Identifier as ArrayIdentifier ).SetValue( Value );
+			else SetValue( Identifier.Name, Value );
 		}
 		public static void MakeValueInCurrentScope ( string Name, Value Value )
 		{
@@ -101,12 +98,20 @@ namespace Kento
 		{
 			scopeList.RemoveLast();
 		}
+		public static void EnterInstanceScope ( Instance Instance )
+		{
+			scopeList.AddLast( Instance.Identifiers );
+			instanceScopes.Push( scopeList.Count );
+		}
 		public static void ExitInstanceScope ()
 		{
-			if ( inInstanceScope )
+			if ( instanceScopes.Count > 0 )
 			{
-				scopeList.RemoveLast();
-				inInstanceScope = false;
+				if ( instanceScopes.Peek() == scopeList.Count )
+				{
+					scopeList.RemoveLast();
+					instanceScopes.Pop();
+				}
 			}
 		}
 		public static void Run ( string Code )

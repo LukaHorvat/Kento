@@ -25,10 +25,6 @@ namespace Kento
 		{
 			arr = new List<Value>();
 		}
-		public override List<Token> Tokenize ()
-		{
-			return new List<Token>( new Token[] { this } );
-		}
 		public override Array ToArray ()
 		{
 			return this;

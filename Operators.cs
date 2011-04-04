@@ -143,6 +143,9 @@ namespace Kento
 			add( "]", typeof( SquareBracketsClosed ) );
 			add( "class", typeof( ClassOperator ) );
 			add( "new", typeof( NewOperator ) );
+			add( "&", typeof( ReferenceOperator ) );
+			add( "&=", typeof( ReferenceAssignment ) );
+			add( "typeof", typeof( TypeofOperator ) );
 
 			representationDictionary.Add( typeof( SufixDecrement ), "--" );
 			representationDictionary.Add( typeof( PrefixDecrement ), "--" );
@@ -251,6 +254,37 @@ namespace Kento
 				var toReturn = First.Evaluate();
 				Compiler.ExitInstanceScope();
 				return toReturn;
+			} else return NoValue.Value;
+		}
+	}
+	class ReferenceAssignment : Operator, IRequiresRuntime
+	{
+		public ReferenceAssignment ()
+			: base( 15, OperatorType.InfixBinary ) { }
+		public override Value Operate ( Value First, Value Second )
+		{
+			Second = Second.Evaluate();
+			if ( First is Identifier )
+			{
+				if ( Second is Reference )
+				{
+					Compiler.SetValue( First as Identifier, ( Second as Reference ).ReferencingValue );
+					var toReturn = First.Evaluate();
+					Compiler.ExitInstanceScope();
+					return toReturn;
+				} else if ( Second != NoValue.Value )
+				{
+					Compiler.SetValue( First as Identifier, new Reference( Second ) );
+					var toReturn = First.Evaluate();
+					Compiler.ExitInstanceScope();
+					return toReturn;
+				} else
+				{
+					Compiler.SetValue( First as Identifier, NoValue.Value );
+					var toReturn = First.Evaluate();
+					Compiler.ExitInstanceScope();
+					return toReturn;
+				}
 			} else return NoValue.Value;
 		}
 	}
@@ -459,11 +493,7 @@ namespace Kento
 			Second = Second.Evaluate();
 			if ( First is Array && Second is Number )
 			{
-				int index = (int)( ( Second as Number ).Val );
-				if ( index >= 0 && index < ( First as Array ).Arr.Count )
-				{
-					return ( First as Array ).Arr[ index ].Evaluate();
-				} else throw new Exception( "Index out of range" );
+				return new ArrayIdentifier( "ArrayIdentifier", ( First as Array ), (int)( Second as Number ).Val );
 			} else return NoValue.Value;
 		}
 	}
@@ -480,6 +510,32 @@ namespace Kento
 				return new Boolean( ( First as Boolean ).Val ? false : true );
 			}
 			return NoValue.Value;
+		}
+	}
+	class ReferenceOperator : Operator, IRequiresRuntime
+	{
+		public ReferenceOperator ()
+			: base( 2, OperatorType.PrefixUnary ) { }
+		public override Value Operate ( Value First, Value Second )
+		{
+			First = First.Evaluate();
+			if ( First is Reference )
+			{
+				return ( First as Reference ).ReferencingValue;
+			} else if ( First != NoValue.Value )
+			{
+				return new Reference( First );
+			} else return NoValue.Value;
+		}
+	}
+	class TypeofOperator:Operator, IRequiresRuntime
+	{
+		public TypeofOperator ()
+			: base( 2, OperatorType.PrefixUnary ) { }
+		public override Value Operate ( Value First, Value Second )
+		{
+			First = First.Evaluate();
+			return new String( First.GetType().ToString() );
 		}
 	}
 
@@ -702,6 +758,7 @@ namespace Kento
 		{
 			First = First.Evaluate();
 			Second = Second.Evaluate();
+			if ( First is Expression ) First = new CodeBlock( First as Expression);
 			if ( First is CodeBlock && Second is CodeBlock )
 			{
 				CodeBlock block = ( Second as CodeBlock );
@@ -791,8 +848,7 @@ namespace Kento
 			First = First.Evaluate();
 			if ( First is Instance && Second is Identifier )
 			{
-				Compiler.SetAsCurrentScope( ( First as Instance ).Identifiers );
-				Compiler.InInstanceScope = true;
+				Compiler.EnterInstanceScope( ( First as Instance ) );
 				return Second;
 			} else return NoValue.Value;
 		}

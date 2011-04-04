@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Objects\ArrayIdentifier.cs" />
     <Compile Include="Objects\ExpressionSequence.cs" />
     <Compile Include="IRequiresRuntime.cs" />
     <Compile Include="Objects\Array.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Objects\Literal.cs" />
     <Compile Include="Objects\Loop.cs" />
     <Compile Include="Objects\Number.cs" />
+    <Compile Include="Objects\Reference.cs" />
     <Compile Include="Objects\Type.cs" />
     <Compile Include="Operators.cs" />
     <Compile Include="Program.cs" />

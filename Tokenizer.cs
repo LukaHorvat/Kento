@@ -93,11 +93,18 @@ namespace Kento
 			Expression.Replace( @"\t", '\t' + "" );
 			var alreadyDone = new List<bool>(); //Stores the already processed operators so the ones like ++ and + don't get processed twice
 			bool inQuote = false;
-			for ( int i = 0 ; i < Expression.Length ; ++i )
+			for ( int i = 0 ; i < Expression.Length ; ++i )//Quotation pass
 			{
 				if ( Expression[ i ] == '"' ) inQuote = inQuote ? false : true;
 				if ( inQuote && Expression[ i ] == ' ' ) Expression[ i ] = (char)7;
 				alreadyDone.Add( inQuote );
+			}
+			for ( int i = 0 ; i < Expression.Length ; ++i ) //Decimal number pass
+			{
+				if ( Expression[ i ] == '.' && getCharType( Expression[ i - 1 ] ) == ParseState.Numbers && getCharType( Expression[ i + 1 ] ) == ParseState.Numbers )
+				{
+					alreadyDone[ i ] = true;
+				}
 			}
 
 			var operatorList = Operators.RepresentationDictionary.Values.ToList();

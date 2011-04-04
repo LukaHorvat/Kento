@@ -21,7 +21,7 @@ namespace Kento
 			Compiler.EnterScope();
 			for ( int i = 0 ; i < Math.Min( Args.Arr.Count, args.Arr.Count ) ; ++i )
 			{
-				Compiler.MakeValueInCurrentScope( ( args.Arr[ i ] as String ).Val, Args.Arr[ i ] );
+				Compiler.MakeValueInCurrentScope( ( args.Arr[ i ] as String ).Val, Args.Arr[ i ].Evaluate().Clone() );
 			}
 			var result = Run();
 			return result;

@@ -13,4 +13,8 @@ Yard = "", "", ""
 
 myMilkshake = new Milkshake
 myMilkshake.Bring(Boys, &Yard)
-ConsoleOutput(Yard[0])
+i=0
+while (i<3) {
+	ConsoleOutput(Yard[i] + " " + typeof Yard[i])
+	i++
+}
