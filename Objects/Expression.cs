@@ -111,7 +111,8 @@ namespace Kento
 				if ( result is NoValue )
 				{
 					return new Expression( (Value)List.First.Next.Value, NoValue.Value, (Operator)List.First.Value, true );
-				} else return result;
+				} 
+				return result;
 			} else
 			{
 				Value result = NoValue.Value;

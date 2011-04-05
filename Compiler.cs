@@ -32,6 +32,13 @@ namespace Kento
 
 		static readonly LinkedList<Dictionary<string, Reference>> scopeList = new LinkedList<Dictionary<string, Reference>>();
 
+		private static Dictionary<string, Reference> globalScope;
+		public static Dictionary<string, Reference> GlobalScope
+		{
+			get { return globalScope; }
+			set { globalScope = value; }
+		}
+
 		static readonly List<Value> memory = new List<Value>();
 		static readonly Stack<int> availabilityStack = new Stack<int>();
 
@@ -41,6 +48,7 @@ namespace Kento
 			get { return fallthrough; }
 			set { fallthrough = value; }
 		}
+
 
 		public static Value GetValue ( int Index )
 		{
@@ -104,11 +112,14 @@ namespace Kento
 				var scope = scopeList.Last.Value;
 				foreach ( var pair in scope )
 				{
-					pair.Value.ReferencingValue = null;
-
+					pair.Value.FreeMemory();
 				}
 			}
 			scopeList.RemoveLast();
+		}
+		public static Dictionary<string, Reference> GetCurrentScope ()
+		{
+			return scopeList.Last.Value;
 		}
 		public static int StoreValue ( Value Value )
 		{
@@ -128,6 +139,11 @@ namespace Kento
 			}
 			return index;
 		}
+		public static void FreeMemory ( int Index )
+		{
+			memory[ Index ] = null;
+			availabilityStack.Push( Index );
+		}
 		public static void Run ( string Code )
 		{
 			Run( Tokenizer.ParseInfixString( Code ).Tokenize() );
@@ -135,6 +151,7 @@ namespace Kento
 		public static void Run ( List<Token> Code )
 		{
 			var defaultScope = Compiler.LoadStandardLibrary();
+			globalScope = defaultScope;
 			scopeList.AddLast( defaultScope );
 
 			runtime = true;

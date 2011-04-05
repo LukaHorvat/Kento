@@ -13,7 +13,7 @@ namespace Kento
 		List<Token> value;
 		public List<Token> Value
 		{
-			get { return this.value; }
+			get { return value; }
 			set { this.value = value; }
 		}
 
@@ -44,12 +44,12 @@ namespace Kento
 			{
 				Compiler.EnterScope();
 			}
-			Stack<Token> solvingStack = new Stack<Token>();
+			var solvingStack = new Stack<Value>();
 			for ( int i = 0 ; i < value.Count ; ++i )
 			{
 				if ( value[ i ] is Operator )
 				{
-					Operator op = (Operator)value[ i ];
+					var op = (Operator)value[ i ];
 					if ( op is ReturnOperator )
 					{
 						Compiler.Fallthrough = FallThroughType.Return;
@@ -64,14 +64,14 @@ namespace Kento
 						Value second = NoValue.Value;
 						if ( op.Type != OperatorType.PrefixUnary && op.Type != OperatorType.SufixUnary )
 						{
-							second = (Value)solvingStack.Pop();
+							second = solvingStack.Pop();
 						}
-						Value result = op.Operate( ( solvingStack.Pop() as Value ), second );
+						var result = op.Operate( solvingStack.Pop(), second );
 						solvingStack.Push( result );
 					}
 				} else
 				{
-					solvingStack.Push( value[ i ] );
+					solvingStack.Push( (Value) value[ i ] );
 				}
 				if ( Compiler.Fallthrough != FallThroughType.NoFallthrough )
 				{
@@ -79,7 +79,8 @@ namespace Kento
 					{
 						Compiler.Fallthrough = FallThroughType.NoFallthrough;
 						break;
-					} else if ( type == CodeBlockType.Loop )
+					}
+					if ( type == CodeBlockType.Loop )
 					{
 						if ( Compiler.Fallthrough == FallThroughType.Continue )
 						{
@@ -87,7 +88,8 @@ namespace Kento
 							i = -1;
 							solvingStack.Clear();
 							continue;
-						} else if ( Compiler.Fallthrough == FallThroughType.Break )
+						}
+						if ( Compiler.Fallthrough == FallThroughType.Break )
 						{
 							Compiler.Fallthrough = FallThroughType.NoFallthrough;
 							break;
@@ -99,7 +101,7 @@ namespace Kento
 				}
 			}
 			Value toReturn = NoValue.Value;
-			if ( solvingStack.Count > 0 ) toReturn = ( solvingStack.Peek() as Value ).Evaluate();
+			if ( solvingStack.Count > 0 ) toReturn = solvingStack.Peek().Evaluate();
 			Compiler.ExitScope( this is Type );
 			return toReturn;
 		}

@@ -10,11 +10,11 @@ namespace Kento
 		}
 		public virtual Array ToArray ()
 		{
-			return new Array( this );
+			return new Array( new Reference( this ) );
 		}
 		public virtual List<Token> Tokenize ()
 		{
-			return new List<Token>( new Token[] { (Token)this } );
+			return new List<Token>( new [] { (Token)this } );
 		}
 		public virtual Value Clone ()
 		{
@@ -26,12 +26,12 @@ namespace Kento
 		static NoValue noValue = new NoValue();
 		public static NoValue Value
 		{
-			get { return NoValue.noValue; }
-			set { NoValue.noValue = value; }
+			get { return noValue; }
+			set { noValue = value; }
 		}
 		public override Value Evaluate ()
 		{
-			return NoValue.Value;
+			return Value;
 		}
 		public override List<Token> Tokenize ()
 		{

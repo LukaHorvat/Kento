@@ -8,9 +8,9 @@ namespace Kento
 			: base( "ConsoleOutput" ) { }
 		public override Value Invoke ( Array Args )
 		{
-			foreach ( Value val in Args.Arr )
+			foreach ( Reference val in Args.Arr )
 			{
-				Console.Write( val.ToString() );
+				Console.Write( val.ReferencingValue.ToString() );
 			}
 			Console.WriteLine();
 			return NoValue.Value;

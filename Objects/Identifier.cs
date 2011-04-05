@@ -23,15 +23,15 @@ namespace Kento
 		{
 			if ( Compiler.Runtime )
 			{
-				return Compiler.Identify( Name );
-			} else
-			{
-				return NoValue.Value;
+				var reference = Compiler.Identify( Name );
+				if ( reference == NullReference.Value )
+				{
+					reference = new Reference( new NoValue() );
+					Compiler.SetAlias( Name, reference );
+				}
+				return reference;
 			}
-		}
-		public override List<Token> Tokenize ()
-		{
-			return new List<Token>( new Token[] { (Token)this } );
+			return NoValue.Value;
 		}
 	}
 }

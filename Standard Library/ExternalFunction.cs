@@ -11,7 +11,7 @@ namespace Kento
 			set { representation = value; }
 		}
 		public ExternalFunction ( string Name )
-			: base( new Array(), new CodeBlock( new List<Token>() ) )
+			: base( new Array(), new CodeBlock( new List<Token>() ), Compiler.GlobalScope )
 		{
 			representation = Name;
 		}

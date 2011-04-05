@@ -1,16 +1,12 @@
-Milkshake = class () {
-	Bring = function ("Boys", "Yard") {
-		Yard &= Yard
-		i=0
-		while (i<3) {
-			Yard[i]=Boys[i]
-			i++
-		}
+Geometry = class () {
+	Circumference = function ("Circle") {
+		return 2 * Circle.Radius * 3.1415
 	}
 }
-Boys = "Boy1","Boy2","Boy3"
-Yard = "", "", ""
-
-myMilkshake = new Milkshake
-myMilkshake.Bring(Boys, &Yard)
-ConsoleOutput(Yard[0])
+Circle = class () {
+	Radius = 0
+}
+geo = new Geometry
+circle = new Circle
+circle.Radius = 10
+ConsoleOutput(geo.Circumference(circle))
