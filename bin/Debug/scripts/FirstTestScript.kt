@@ -1,12 +1,20 @@
-Geometry = class () {
-	Circumference = function ("Circle") {
-		return 2 * Circle.Radius * 3.1415
+Array = MakeArray(100)
+i = 0
+while (i < 100) {
+	Array[i] = GetTime()
+	++i
+}
+i = 0
+while (i < 100) {
+	j = i
+	while (j < 100) {
+		if (Array[i] < Array[j]) {
+			temp = Array[i]
+			Array[i] = Array[j]
+			Array[j] = temp
+		}
+		++j
 	}
+	++i
 }
-Circle = class () {
-	Radius = 0
-}
-geo = new Geometry
-circle = new Circle
-circle.Radius = 10
-ConsoleOutput(geo.Circumference(circle))
+ConsoleOutput(GetTime())

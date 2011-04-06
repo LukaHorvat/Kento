@@ -640,7 +640,7 @@ namespace Kento
 		}
 	}
 
-	class NotEqualTo : Operator
+	class NotEqualTo : Operator, IRequiresRuntime
 	{
 		public NotEqualTo ()
 			: base( 7, OperatorType.InfixBinary ) { }
@@ -663,7 +663,7 @@ namespace Kento
 			return new Boolean( true );
 		}
 	}
-	class EqualTo : Operator
+	class EqualTo : Operator, IRequiresRuntime
 	{
 		public EqualTo ()
 			: base( 7, OperatorType.InfixBinary ) { }
@@ -686,7 +686,7 @@ namespace Kento
 			throw new Exception( "Operands are not comparable" );
 		}
 	}
-	class LessThan : Operator
+	class LessThan : Operator, IRequiresRuntime
 	{
 		public LessThan ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -704,7 +704,7 @@ namespace Kento
 			return NoValue.Value;
 		}
 	}
-	class LessOrEqual : Operator
+	class LessOrEqual : Operator, IRequiresRuntime
 	{
 		public LessOrEqual ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -721,7 +721,7 @@ namespace Kento
 			throw new Exception( "Operands must be numbers" );
 		}
 	}
-	class GreaterThan : Operator
+	class GreaterThan : Operator, IRequiresRuntime
 	{
 		public GreaterThan ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -737,7 +737,7 @@ namespace Kento
 			throw new Exception( "Operands must be numbers" );
 		}
 	}
-	class GreaterOrEqual : Operator
+	class GreaterOrEqual : Operator, IRequiresRuntime
 	{
 		public GreaterOrEqual ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -754,7 +754,7 @@ namespace Kento
 		}
 	}
 
-	class LogicalOr : Operator
+	class LogicalOr : Operator, IRequiresRuntime
 	{
 		public LogicalOr ()
 			: base( 12, OperatorType.InfixBinary ) { }
@@ -771,7 +771,7 @@ namespace Kento
 			throw new Exception( "Operands must be boolean" );
 		}
 	}
-	class LogicalAnd : Operator
+	class LogicalAnd : Operator, IRequiresRuntime
 	{
 		public LogicalAnd ()
 			: base( 11, OperatorType.InfixBinary ) { }

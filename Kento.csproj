@@ -71,6 +71,7 @@
     <Compile Include="Standard Library\ConsoleOutput.cs" />
     <Compile Include="Standard Library\ExternalFunction.cs" />
     <Compile Include="Standard Library\GetExecutionTime.cs" />
+    <Compile Include="Standard Library\MakeArray.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="TokenList.cs" />
