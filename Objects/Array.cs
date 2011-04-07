@@ -3,8 +3,9 @@ using System.Linq;
 
 namespace Kento
 {
-	public class Array : Value
+	public class Array : Value, IInstance
 	{
+		public Scope Identifiers { get; set; }
 		List<Reference> arr;
 		public List<Reference> Arr
 		{
@@ -29,7 +30,7 @@ namespace Kento
 		}
 		public override Value Clone ()
 		{
-			var list = arr.Select(Val => (Val.Clone() as Reference)).ToList();
+			var list = arr.Select( Val => ( Val.Clone() as Reference ) ).ToList();
 			return new Array( list );
 		}
 	}

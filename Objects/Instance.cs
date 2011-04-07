@@ -2,38 +2,33 @@
 
 namespace Kento
 {
-	class Instance : Value
+	class Instance : Value, IInstance
 	{
-		Dictionary<string, Reference> identifiers;
-		public Dictionary<string, Reference> Identifiers
-		{
-			get { return identifiers; }
-			set { identifiers = value; }
-		}
+		public Scope Identifiers { get; set; }
 
 		public Instance ( Type Type )
 		{
-			identifiers = Type.Identifiers.Clone();
+			Identifiers = Type.Identifiers.Clone();
 			RewireFunctions();
 		}
-		public Instance ( Dictionary<string, Reference> Identifiers )
+		public Instance ( Scope Identifiers )
 		{
-			identifiers = Identifiers.Clone();
+			this.Identifiers = Identifiers.Clone();
 			RewireFunctions();
 		}
 		void RewireFunctions ()
 		{
-			foreach ( var pair in identifiers )
+			foreach ( var pair in Identifiers )
 			{
 				if ( pair.Value.ReferencingValue is Function )
 				{
-					( pair.Value.ReferencingValue as Function ).Scope = identifiers;
+					( pair.Value.ReferencingValue as Function ).Scope = Identifiers;
 				}
 			}
 		}
 		public override Value Clone ()
 		{
-			return new Instance( identifiers );
+			return new Instance( Identifiers );
 		}
 	}
 }

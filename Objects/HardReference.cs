@@ -9,11 +9,7 @@
 		}
 		public override Value Clone ()
 		{
-			return this;
-		}
-		public override void FreeMemory ()
-		{
-			//Hard references don't get freed when the scope is exited
+			return new Reference( index );
 		}
 		public void ForceFree ()
 		{

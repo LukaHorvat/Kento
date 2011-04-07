@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Objects\ExpressionSequence.cs" />
     <Compile Include="IRequiresRuntime.cs" />
     <Compile Include="Objects\Array.cs" />
@@ -57,6 +56,7 @@
     <Compile Include="Objects\Function.cs" />
     <Compile Include="Objects\HardReference.cs" />
     <Compile Include="Objects\Identifier.cs" />
+    <Compile Include="Objects\IInstance.cs" />
     <Compile Include="Objects\Instance.cs" />
     <Compile Include="Objects\Literal.cs" />
     <Compile Include="Objects\Loop.cs" />
@@ -64,18 +64,22 @@
     <Compile Include="Objects\Reference.cs" />
     <Compile Include="Objects\Type.cs" />
     <Compile Include="Operators.cs" />
+    <Compile Include="OperatorType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Objects\String.cs" />
+    <Compile Include="Scope.cs" />
     <Compile Include="Standard Library\ConsoleInput.cs" />
     <Compile Include="Standard Library\ConsoleOutput.cs" />
     <Compile Include="Standard Library\ExternalFunction.cs" />
     <Compile Include="Standard Library\GetExecutionTime.cs" />
     <Compile Include="Standard Library\MakeArray.cs" />
+    <Compile Include="Standard Library\StandardLibrary.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="TokenList.cs" />
     <Compile Include="TokenListNode.cs" />
+    <Compile Include="Utility\Profiler.cs" />
     <Compile Include="Value.cs" />
     <Compile Include="Objects\Variable.cs" />
   </ItemGroup>
@@ -85,6 +89,7 @@
   <ItemGroup>
     <Content Include="kicon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

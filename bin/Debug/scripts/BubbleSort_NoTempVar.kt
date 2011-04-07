@@ -10,9 +10,9 @@ while (i < 100) {
 	j = i
 	while (j < 100) {
 		if (Array[i] < Array[j]) {
-			temp &= Array[i]
-			Array[i] &= Array[j]
-			Array[j] &= temp
+			Array[i] += Array[j]
+			Array[j] = Array[i] - Array[j]
+			Array[i] -= Array[j]
 		}
 		++j
 	}

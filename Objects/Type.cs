@@ -4,8 +4,8 @@ namespace Kento
 {
 	class Type : CodeBlock
 	{
-		Dictionary<string, Reference> identifiers;
-		public Dictionary<string, Reference> Identifiers
+		Scope identifiers;
+		public Scope Identifiers
 		{
 			get { return identifiers; }
 			set { identifiers = value; }
@@ -24,7 +24,7 @@ namespace Kento
 		public Type ( CodeBlock Code )
 			: base( Code.Value )
 		{
-			identifiers = new Dictionary<string, Reference>();
+			identifiers = new Scope();
 		}
 		public override Value Run ()
 		{

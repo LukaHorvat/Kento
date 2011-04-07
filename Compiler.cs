@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Kento.Utility;
 
 namespace Kento
 {
@@ -14,6 +15,13 @@ namespace Kento
 		NoFallthrough
 	}
 
+	[Flags]
+	enum RuntimeFlags
+	{
+		Default = 0x00,
+		Debug = 0x01
+	}
+
 	class Compiler
 	{
 		static Stopwatch timer;
@@ -23,24 +31,15 @@ namespace Kento
 			get { return timer.ElapsedTicks / (float)Stopwatch.Frequency * 1000; }
 		}
 
-		static bool runtime;
-		public static bool Runtime
-		{
-			get { return runtime; }
-			set { runtime = value; }
-		}
+		public static bool Runtime { get; set; }
 
-		static readonly LinkedList<Dictionary<string, Reference>> scopeList = new LinkedList<Dictionary<string, Reference>>();
+		static readonly LinkedList<Scope> scopeList = new LinkedList<Scope>();
 
-		private static Dictionary<string, Reference> globalScope;
-		public static Dictionary<string, Reference> GlobalScope
-		{
-			get { return globalScope; }
-			set { globalScope = value; }
-		}
+		public static Scope GlobalScope { get; set; }
 
 		static readonly List<Value> memory = new List<Value>();
 		static readonly Stack<int> availabilityStack = new Stack<int>();
+		static readonly List<LinkedList<Reference>> referenceList = new List<LinkedList<Reference>>();
 
 		static FallThroughType fallthrough = FallThroughType.NoFallthrough;
 		public static FallThroughType Fallthrough
@@ -48,7 +47,6 @@ namespace Kento
 			get { return fallthrough; }
 			set { fallthrough = value; }
 		}
-
 
 		public static Value GetValue ( int Index )
 		{
@@ -97,13 +95,13 @@ namespace Kento
 		{
 			SetAliasInCurrentScope( Name, new Reference( Index ) );
 		}
-		public static void SetAsCurrentScope ( Dictionary<string, Reference> Scope )
+		public static void SetAsCurrentScope ( Scope Scope )
 		{
 			scopeList.AddLast( Scope );
 		}
 		public static void EnterScope ()
 		{
-			scopeList.AddLast( new Dictionary<string, Reference>() );
+			scopeList.AddLast( new Scope() );
 		}
 		public static void ExitScope ( bool DoNotDestroy = false )
 		{
@@ -112,18 +110,17 @@ namespace Kento
 				var scope = scopeList.Last.Value;
 				foreach ( var pair in scope )
 				{
-					pair.Value.FreeMemory();
+					pair.Value.Dereference();
 				}
 			}
 			scopeList.RemoveLast();
 		}
-		public static Dictionary<string, Reference> GetCurrentScope ()
+		public static Scope GetCurrentScope ()
 		{
 			return scopeList.Last.Value;
 		}
 		public static int StoreValue ( Value Value )
 		{
-
 			var foundIndex = memory.IndexOf( Value );
 			if ( foundIndex != -1 ) return foundIndex;
 
@@ -136,6 +133,7 @@ namespace Kento
 			{
 				index = memory.Count;
 				memory.Add( Value );
+				referenceList.Add( new LinkedList<Reference>() );
 			}
 			return index;
 		}
@@ -144,26 +142,34 @@ namespace Kento
 			memory[ Index ] = null;
 			availabilityStack.Push( Index );
 		}
-		public static void Run ( string Code )
+		public static void RegisterReference ( Reference Reference, int Index )
 		{
-			Run( Tokenizer.ParseInfixString( Code ).Tokenize() );
+			referenceList[ Index ].AddLast( Reference );
+		}
+		public static void Deference ( Reference Reference, int Index )
+		{
+			referenceList[ Index ].Remove( Reference );
+			if ( referenceList[ Index ].Count == 0 )
+			{
+				FreeMemory( Index );
+			}
 		}
 		public static void Run ( List<Token> Code )
 		{
 			var defaultScope = Compiler.LoadStandardLibrary();
-			globalScope = defaultScope;
+			GlobalScope = defaultScope;
 			scopeList.AddLast( defaultScope );
 
-			runtime = true;
+			Runtime = true;
 			timer = new Stopwatch(); timer.Start();
 
 			new CodeBlock( Code ).Run();
 
 			timer.Stop();
 		}
-		public static Dictionary<string, Reference> LoadStandardLibrary ()
+		public static Scope LoadStandardLibrary ()
 		{
-			var lib = new Dictionary<string, Reference>();
+			var lib = new Scope();
 			var asm = Assembly.GetExecutingAssembly();
 			var externalFunctions = asm.GetTypes().Where( x => x.IsSubclassOf( typeof( ExternalFunction ) ) );
 
@@ -174,6 +180,20 @@ namespace Kento
 			}
 
 			return lib;
+		}
+		public static void RunFromFile ( string Path, RuntimeFlags Options )
+		{
+			string source;
+			using ( var reader = new System.IO.StreamReader( Path ) )
+			{
+				source = reader.ReadToEnd();
+			}
+			RunFromSource( source, Options );
+		}
+		public static void RunFromSource ( string Code, RuntimeFlags Options )
+		{
+			Run( Tokenizer.ParseInfixString( Code ).Tokenize() );
+			if ( ( Options & RuntimeFlags.Debug ) == RuntimeFlags.Debug ) Profiler.OutputTime();
 		}
 	}
 }

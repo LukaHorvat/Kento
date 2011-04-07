@@ -12,10 +12,13 @@
 		public Reference ( Value ValueToReference )
 		{
 			index = Compiler.StoreValue( ValueToReference );
+			Compiler.RegisterReference( this, index );
 		}
 		public Reference ( int Index )
 		{
 			index = Index;
+			if ( index != -1 ) //NullReference case
+				Compiler.RegisterReference( this, index );
 		}
 		public void ChangeReference ( Reference Reference )
 		{
@@ -23,7 +26,9 @@
 		}
 		public void ChangeReference ( int Index )
 		{
+			Dereference();
 			index = Index;
+			Compiler.RegisterReference( this, index );
 		}
 		public override Value Clone ()
 		{
@@ -33,9 +38,10 @@
 		{
 			return new HardReference( index );
 		}
-		public virtual void FreeMemory ()
+		public virtual void Dereference ()
 		{
-			Compiler.FreeMemory( index );
+			Compiler.Deference( this, index );
+			index = -1;
 		}
 	}
 	class NullReference : Reference

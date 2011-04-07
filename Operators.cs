@@ -1,43 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+// ReSharper disable RedundantUsingDirective
+using Kento.Utility;
+// ReSharper restore RedundantUsingDirective
 
 namespace Kento
 {
-	enum OperatorType : int
-	{
-		PrefixUnary = 0,
-		SufixUnary,
-		InfixBinary,
-		PrefixBinary,
-		SufixBinary,
-		Special
-	}
 	abstract class Operator : Token
 	{
-		private int precedance;
-		public int Precedance
-		{
-			get { return precedance; }
-			set { precedance = value; }
-		}
+		public int Precedance { get; set; }
 
 		public override string ToString ()
 		{
-			return Operators.RepresentationDictionary[ this.GetType() ];
+			return Operators.RepresentationDictionary[ GetType() ];
 		}
 
-		protected OperatorType type;
-		public OperatorType Type
-		{
-			get { return type; }
-			set { type = value; }
-		}
+		public OperatorType Type { get; set; }
 
-		public Operator ( int Precedance, OperatorType Type )
+		protected Operator ( int Precedance, OperatorType Type )
 		{
-			precedance = Precedance;
-			type = Type;
+			this.Precedance = Precedance;
+			this.Type = Type;
 		}
 		public abstract Value Operate ( Value First, Value Second );
 	}
@@ -69,32 +53,27 @@ namespace Kento
 	}
 	class Operators
 	{
-		static int lowestPrecedance;
-		public static int LowestPrecedance
-		{
-			get { return Operators.lowestPrecedance; }
-			set { Operators.lowestPrecedance = value; }
-		}
+		public static int LowestPrecedance { get; set; }
 
 		static Dictionary<string, System.Type> operatorDictionary;
 		public static Dictionary<string, System.Type> OperatorDictionary
 		{
-			get { return Operators.operatorDictionary; }
-			set { Operators.operatorDictionary = value; }
+			get { return operatorDictionary; }
+			set { operatorDictionary = value; }
 		}
 
 		static Dictionary<System.Type, string> representationDictionary;
 		public static Dictionary<System.Type, string> RepresentationDictionary
 		{
-			get { return Operators.representationDictionary; }
-			set { Operators.representationDictionary = value; }
+			get { return representationDictionary; }
+			set { representationDictionary = value; }
 		}
 
 		static LinkedList<BracketType> brackets;
 		public static LinkedList<BracketType> Brackets
 		{
-			get { return Operators.brackets; }
-			set { Operators.brackets = value; }
+			get { return brackets; }
+			set { brackets = value; }
 		}
 
 		static Operators ()
@@ -103,48 +82,48 @@ namespace Kento
 			representationDictionary = new Dictionary<System.Type, string>();
 			brackets = new LinkedList<BracketType>();
 
-			add( "-=", typeof( SubtractiveAssignment ) );
-			add( "-", typeof( Subtraction ) );
-			add( "(", typeof( ParenthesisOpen ) );
-			add( ")", typeof( ParenthesisClosed ) );
-			add( "!", typeof( NotOperator ) );
-			add( "!=", typeof( NotEqualTo ) );
-			add( "*=", typeof( MultiplicativeAssignment ) );
-			add( "*", typeof( Multiplication ) );
-			add( "%", typeof( ModOperator ) );
-			add( "%=", typeof( ModAssignment ) );
-			add( "||", typeof( LogicalOr ) );
-			add( "&&", typeof( LogicalAnd ) );
-			add( "<", typeof( LessThan ) );
-			add( "<=", typeof( LessOrEqual ) );
-			add( ">", typeof( GreaterThan ) );
-			add( ">=", typeof( GreaterOrEqual ) );
-			add( "==", typeof( EqualTo ) );
-			add( "+=", typeof( AdditiveAssignment ) );
-			add( "=", typeof( Assignment ) );
-			add( "/", typeof( Division ) );
-			add( "/=", typeof( DivisiveAssignment ) );
-			add( "+", typeof( Addition ) );
-			add( ".", typeof( DotOperator ) );
-			add( "?", typeof( Unidentified ) );
-			add( "if", typeof( IfOperator ) );
-			add( "else", typeof( ElseOperator ) );
-			add( "{", typeof( CurlyBracesOpen ) );
-			add( "}", typeof( CurlyBracesClosed ) );
-			add( ",", typeof( CommaOperator ) );
-			add( "function", typeof( FunctionOperator ) );
-			add( "return", typeof( ReturnOperator ) );
-			add( "continue", typeof( ContinueOperator ) );
-			add( "break", typeof( BreakOperator ) );
-			add( "while", typeof( WhileOperator ) );
-			add( "[", typeof( SquareBracketsOpen ) );
-			add( "]", typeof( SquareBracketsClosed ) );
-			add( "class", typeof( ClassOperator ) );
-			add( "new", typeof( NewOperator ) );
-			add( "&", typeof( ReferenceOperator ) );
-			add( "&=", typeof( ReferenceAssignment ) );
-			add( "typeof", typeof( TypeofOperator ) );
-			add( "declare", typeof( DeclareOperator ) );
+			Add( "-=", typeof( SubtractiveAssignment ) );
+			Add( "-", typeof( Subtraction ) );
+			Add( "(", typeof( ParenthesisOpen ) );
+			Add( ")", typeof( ParenthesisClosed ) );
+			Add( "!", typeof( NotOperator ) );
+			Add( "!=", typeof( NotEqualTo ) );
+			Add( "*=", typeof( MultiplicativeAssignment ) );
+			Add( "*", typeof( Multiplication ) );
+			Add( "%", typeof( ModOperator ) );
+			Add( "%=", typeof( ModAssignment ) );
+			Add( "||", typeof( LogicalOr ) );
+			Add( "&&", typeof( LogicalAnd ) );
+			Add( "<", typeof( LessThan ) );
+			Add( "<=", typeof( LessOrEqual ) );
+			Add( ">", typeof( GreaterThan ) );
+			Add( ">=", typeof( GreaterOrEqual ) );
+			Add( "==", typeof( EqualTo ) );
+			Add( "+=", typeof( AdditiveAssignment ) );
+			Add( "=", typeof( Assignment ) );
+			Add( "/", typeof( Division ) );
+			Add( "/=", typeof( DivisiveAssignment ) );
+			Add( "+", typeof( Addition ) );
+			Add( ".", typeof( DotOperator ) );
+			Add( "?", typeof( Unidentified ) );
+			Add( "if", typeof( IfOperator ) );
+			Add( "else", typeof( ElseOperator ) );
+			Add( "{", typeof( CurlyBracesOpen ) );
+			Add( "}", typeof( CurlyBracesClosed ) );
+			Add( ",", typeof( CommaOperator ) );
+			Add( "function", typeof( FunctionOperator ) );
+			Add( "return", typeof( ReturnOperator ) );
+			Add( "continue", typeof( ContinueOperator ) );
+			Add( "break", typeof( BreakOperator ) );
+			Add( "while", typeof( WhileOperator ) );
+			Add( "[", typeof( SquareBracketsOpen ) );
+			Add( "]", typeof( SquareBracketsClosed ) );
+			Add( "class", typeof( ClassOperator ) );
+			Add( "new", typeof( NewOperator ) );
+			Add( "&", typeof( ReferenceOperator ) );
+			Add( "&=", typeof( ReferenceAssignment ) );
+			Add( "typeof", typeof( TypeofOperator ) );
+			Add( "declare", typeof( DeclareOperator ) );
 
 			representationDictionary.Add( typeof( SufixDecrement ), "--" );
 			representationDictionary.Add( typeof( PrefixDecrement ), "--" );
@@ -154,12 +133,12 @@ namespace Kento
 			representationDictionary.Add( typeof( MakeCodeBlock ), "makeCB!" );
 			representationDictionary.Add( typeof( AccessValueAtIndex ), "index!" );
 
-			lowestPrecedance = representationDictionary.Keys.Max( X => ( (Operator)Activator.CreateInstance( X ) ).Precedance );
+			LowestPrecedance = representationDictionary.Keys.Max( X => ( (Operator)Activator.CreateInstance( X ) ).Precedance );
 
 			brackets.AddLast( new BracketType( typeof( CurlyBracesOpen ), typeof( CurlyBracesClosed ), typeof( MakeCodeBlock ) ) );
 			brackets.AddLast( new BracketType( typeof( SquareBracketsOpen ), typeof( SquareBracketsClosed ), typeof( AccessValueAtIndex ) ) );
 		}
-		static void add ( string Rep, System.Type Type )
+		static void Add ( string Rep, System.Type Type )
 		{
 			operatorDictionary.Add( Rep, Type );
 			representationDictionary.Add( Type, Rep );
@@ -333,13 +312,13 @@ namespace Kento
 		{
 			First = First.Evaluate();
 			Second = Second.Evaluate();
-			bool clone = !( Second is HardReference );
+			bool clone = Second is Reference && !( Second is HardReference );
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
 			if ( First is Reference )
 			{
 				var toSet = clone ? Second.Clone() : Second;
-				( First as Reference ).ChangeReference( Compiler.StoreValue( toSet ) );
+				( First as Reference ).ReferencingValue = toSet;
 				return toSet;
 			}
 			throw new Exception( "Operands must be an identifier and a value" );
@@ -583,7 +562,7 @@ namespace Kento
 
 			if ( First is Array && Second is Number )
 			{
-				int index = (int)( Second as Number ).Val;
+				var index = (int)( Second as Number ).Val;
 				if ( index >= 0 && index < ( First as Array ).Arr.Count )
 				{
 					var toReturn = ( First as Array ).Arr[ index ];
@@ -655,9 +634,9 @@ namespace Kento
 
 			if ( First.GetType() == Second.GetType() )
 			{
-				if ( First is Number ) return new Boolean( ( First as Number ).Val != ( Second as Number ).Val );
-				if ( First is String ) return new Boolean( ( First as String ).Val != ( Second as String ).Val );
-				if ( First is Boolean ) return new Boolean( ( First as Boolean ).Val != ( Second as Boolean ).Val );
+				if ( First is Number ) return new Boolean( ( First as Number ).Val != ( (Number)Second ).Val );
+				if ( First is String ) return new Boolean( ( First as String ).Val != ( (String)Second ).Val );
+				if ( First is Boolean ) return new Boolean( ( First as Boolean ).Val != ( (Boolean)Second ).Val );
 				throw new Exception( "Operands are not comparable" );
 			}
 			return new Boolean( true );
@@ -678,9 +657,9 @@ namespace Kento
 
 			if ( !( First is NoValue || Second is NoValue ) && First.GetType() == Second.GetType() )
 			{
-				if ( First is Number ) return new Boolean( ( First as Number ).Val == ( Second as Number ).Val );
-				if ( First is String ) return new Boolean( ( First as String ).Val == ( Second as String ).Val );
-				if ( First is Boolean ) return new Boolean( ( First as Boolean ).Val == ( Second as Boolean ).Val );
+				if ( First is Number ) return new Boolean( ( First as Number ).Val == ( (Number)Second ).Val );
+				if ( First is String ) return new Boolean( ( First as String ).Val == ( (String)Second ).Val );
+				if ( First is Boolean ) return new Boolean( ( First as Boolean ).Val == ( (Boolean)Second ).Val );
 				throw new Exception( "Operands are not comparable" );
 			}
 			throw new Exception( "Operands are not comparable" );
@@ -699,7 +678,11 @@ namespace Kento
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
-			if ( First is Number && Second is Number ) return new Boolean( ( First as Number ).Val < ( Second as Number ).Val );
+			if ( First is Number && Second is Number )
+			{
+				var toReturn = new Boolean( ( First as Number ).Val < ( Second as Number ).Val );
+				return toReturn;
+			}
 			if ( Compiler.Runtime ) throw new Exception( "Operands must be numbers" );
 			return NoValue.Value;
 		}
@@ -802,9 +785,10 @@ namespace Kento
 			{
 				if ( ( First as Reference ).ReferencingValue is Number )
 				{
-					var toReturn = new Number( ( ( First as Reference ).ReferencingValue as Number ).Val + 1 );
+					var oldNumber = ( ( First as Reference ).ReferencingValue as Number );
+					var toReturn = new Number( oldNumber.Val + 1 );
 					( First as Reference ).ReferencingValue = toReturn;
-					return toReturn;
+					return oldNumber;
 				}
 				throw new Exception( "Operand must be a number" );
 			}
@@ -824,9 +808,10 @@ namespace Kento
 			{
 				if ( ( First as Reference ).ReferencingValue is Number )
 				{
-					var toReturn = new Number( ( ( First as Reference ).ReferencingValue as Number ).Val - 1 );
+					var oldNumber = ( ( First as Reference ).ReferencingValue as Number );
+					var toReturn = new Number( oldNumber.Val - 1 );
 					( First as Reference ).ReferencingValue = toReturn;
-					return toReturn;
+					return oldNumber;
 				}
 				throw new Exception( "Operand must be a number" );
 			}
@@ -903,7 +888,11 @@ namespace Kento
 
 			if ( First is Boolean && Second is CodeBlock )
 			{
-				if ( ( First as Boolean ).Val ) return ( Second as CodeBlock ).Run();
+				if ( ( First as Boolean ).Val )
+				{
+					var toReturn = ( Second as CodeBlock ).Run();
+					return toReturn;
+				}
 				return new ConditionNotMet();
 			}
 			throw new Exception( "Operands must be a boolean and a code block" );
@@ -944,13 +933,7 @@ namespace Kento
 			if ( First is Expression ) First = new CodeBlock( First as Expression );
 			if ( First is CodeBlock && Second is CodeBlock )
 			{
-				var block = ( Second as CodeBlock );
-				block.Value.AddRange( ( First as CodeBlock ).Value );
-				block.Value.Add( new CodeBlock( new Token[] { new ContinueOperator() }.ToList() ) );
-				block.Value.Add( new IfOperator() );
-				block.Value.Add( new CodeBlock( new Token[] { new BreakOperator() }.ToList() ) );
-				block.Value.Add( new ElseOperator() );
-				return new Loop( block );
+				return new Loop( First as CodeBlock, Second as CodeBlock );
 			}
 			throw new Exception( "Operands must be code blocks" );
 		}
@@ -968,12 +951,11 @@ namespace Kento
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
-			Array arr = First.ToArray();
-			CodeBlock code;
+			var arr = First.ToArray();
 
 			if ( Second is CodeBlock )
 			{
-				code = ( Second as CodeBlock );
+				var code = ( Second as CodeBlock );
 				return new Function( arr, code, Compiler.GetCurrentScope() );
 			}
 			throw new Exception( "Function must be followed by a list and a code block" );
@@ -1073,8 +1055,8 @@ namespace Kento
 
 			if ( First is Instance && Second is Identifier )
 			{
-				Instance inst = First as Instance;
-				Identifier ident = Second as Identifier;
+				var inst = First as Instance;
+				var ident = Second as Identifier;
 				if ( inst.Identifiers.ContainsKey( ident.Name ) )
 				{
 					Compiler.SetAsCurrentScope( inst.Identifiers );

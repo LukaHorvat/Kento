@@ -6,14 +6,14 @@ namespace Kento
 	class Function : CodeBlock
 	{
 		List<String> args;
-		private Dictionary<string, Reference> scope;
-		public Dictionary<string, Reference> Scope
+		private Scope scope;
+		public Scope Scope
 		{
 			get { return scope; }
 			set { scope = value; }
 		}
 
-		public Function ( Array Arguments, CodeBlock Code, Dictionary<string, Reference> Scope )
+		public Function ( Array Arguments, CodeBlock Code, Scope Scope )
 			: base( Code.Value )
 		{
 			scope = Scope;
@@ -27,7 +27,7 @@ namespace Kento
 			}
 			Type = CodeBlockType.Function;
 		}
-		public Function ( List<String> Arguments, List<Token> Code, Dictionary<string, Reference> Scope )
+		public Function ( List<String> Arguments, List<Token> Code, Scope Scope )
 			: base( Code )
 		{
 			scope = Scope;

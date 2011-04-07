@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using Kento.Utility;
 
 namespace Kento
 {
@@ -13,10 +13,7 @@ namespace Kento
 				Console.ReadKey();
 				return;
 			}
-			using ( StreamReader reader = new StreamReader( args[ 0 ] ) )
-			{
-				Compiler.Run( reader.ReadToEnd() );
-			}
+			Compiler.RunFromFile( args[ 0 ], RuntimeFlags.Debug );
 			Console.ReadKey();
 		}
 	}
