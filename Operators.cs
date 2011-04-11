@@ -124,6 +124,7 @@ namespace Kento
 			Add( "&=", typeof( ReferenceAssignment ) );
 			Add( "typeof", typeof( TypeofOperator ) );
 			Add( "declare", typeof( DeclareOperator ) );
+			Add( "static", typeof( StaticOperator ) );
 
 			representationDictionary.Add( typeof( SufixDecrement ), "--" );
 			representationDictionary.Add( typeof( PrefixDecrement ), "--" );
@@ -145,15 +146,13 @@ namespace Kento
 		}
 	}
 
-	class SubtractiveAssignment : Operator, IRequiresRuntime
+	class SubtractiveAssignment : Operator
 	{
 		public SubtractiveAssignment ()
 			: base( 15, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference )
 			{
 				var value1 = ( First as Reference ).ReferencingValue;
@@ -173,15 +172,13 @@ namespace Kento
 			throw new Exception( "Assignment needs an identifier" );
 		}
 	}
-	class DivisiveAssignment : Operator, IRequiresRuntime
+	class DivisiveAssignment : Operator
 	{
 		public DivisiveAssignment ()
 			: base( 15, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference )
 			{
 				var value1 = ( First as Reference ).ReferencingValue;
@@ -201,15 +198,13 @@ namespace Kento
 			throw new Exception( "Assignment needs an identifier" );
 		}
 	}
-	class MultiplicativeAssignment : Operator, IRequiresRuntime
+	class MultiplicativeAssignment : Operator
 	{
 		public MultiplicativeAssignment ()
 			: base( 15, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference )
 			{
 				var value1 = ( First as Reference ).ReferencingValue;
@@ -229,15 +224,13 @@ namespace Kento
 			throw new Exception( "Assignment needs an identifier" );
 		}
 	}
-	class AdditiveAssignment : Operator, IRequiresRuntime
+	class AdditiveAssignment : Operator
 	{
 		public AdditiveAssignment ()
 			: base( 15, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference )
 			{
 				var value1 = ( First as Reference ).ReferencingValue;
@@ -257,15 +250,13 @@ namespace Kento
 			throw new Exception( "Assignment needs an identifier" );
 		}
 	}
-	class ModAssignment : Operator, IRequiresRuntime
+	class ModAssignment : Operator
 	{
 		public ModAssignment ()
 			: base( 14, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference )
 			{
 				var value1 = ( First as Reference ).ReferencingValue;
@@ -285,15 +276,13 @@ namespace Kento
 			throw new Exception( "Assignment needs an identifier" );
 		}
 	}
-	class ReferenceAssignment : Operator, IRequiresRuntime
+	class ReferenceAssignment : Operator
 	{
 		public ReferenceAssignment ()
 			: base( 15, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 
 			if ( First is Reference && Second is Reference )
 			{
@@ -303,15 +292,13 @@ namespace Kento
 			throw new Exception( "Both operands must be identifiers" );
 		}
 	}
-	class Assignment : Operator, IRequiresRuntime
+	class Assignment : Operator
 	{
 		public Assignment ()
 			: base( 15, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			bool clone = Second is Reference && !( Second is HardReference );
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -325,17 +312,13 @@ namespace Kento
 		}
 	}
 
-	class Subtraction : Operator
+	class Subtraction : Operator, ICanRunAtCompile
 	{
 		public Subtraction ()
 			: base( 4, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Number && Second is Number ) return new Number( ( First as Number ).Val - ( Second as Number ).Val );
-			if ( !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -345,18 +328,19 @@ namespace Kento
 			}
 			throw new Exception( "Both operands must be numbers" );
 		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			if ( First is Number && Second is Number ) return new Number( ( First as Number ).Val - ( Second as Number ).Val );
+			return NoValue.Value;
+		}
 	}
-	class Division : Operator
+	class Division : Operator, ICanRunAtCompile
 	{
 		public Division ()
 			: base( 3, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Number && Second is Number ) return new Number( ( First as Number ).Val / ( Second as Number ).Val );
-			if ( !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -366,30 +350,22 @@ namespace Kento
 			}
 			throw new Exception( "Both operands must be numbers" );
 		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			if ( First is Number && Second is Number ) return new Number( ( First as Number ).Val / ( Second as Number ).Val );
+			return NoValue.Value;
+		}
 	}
-	class Addition : Operator
+	class Addition : Operator, ICanRunAtCompile
 	{
 		public Addition ()
 			: base( 4, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
-			if ( First is NoValue || Second is NoValue
-				|| First is Expression || Second is Expression
-				|| First is ExpressionSequence || Second is ExpressionSequence
-				|| First is CodeBlock || Second is CodeBlock )
-			{
-				if ( Compiler.Runtime )
-				{
-					throw new Exception( "One of the operands is of wrong type" );
-				}
-				return NoValue.Value;
-			}
 			if ( First is Number && Second is Number )
 			{
 				return new Number( ( First as Number ).Val + ( Second as Number ).Val );
@@ -400,18 +376,33 @@ namespace Kento
 			}
 			throw new Exception( "Both operands must be numbers or one of the operands must be a string" );
 		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			if ( First == NoValue.Value || Second == NoValue.Value
+				|| First is Expression || Second is Expression
+				|| First is ExpressionSequence || Second is ExpressionSequence
+				|| First is CodeBlock || Second is CodeBlock )
+			{
+				return NoValue.Value;
+			}
+			if ( First is Number && Second is Number )
+			{
+				return new Number( ( First as Number ).Val + ( Second as Number ).Val );
+			}
+			if ( First is String || Second is String )
+			{
+				return new String( First.ToString() + Second );
+			}
+			return NoValue.Value;
+		}
 	}
-	class Multiplication : Operator
+	class Multiplication : Operator, ICanRunAtCompile
 	{
 		public Multiplication ()
 			: base( 3, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Number && Second is Number ) return new Number( ( First as Number ).Val * ( Second as Number ).Val );
-			if ( !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -421,18 +412,19 @@ namespace Kento
 			}
 			throw new Exception( "Both operands must be numbers" );
 		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			if ( First is Number && Second is Number ) return new Number( ( First as Number ).Val * ( Second as Number ).Val );
+			return NoValue.Value;
+		}
 	}
-	class ModOperator : Operator
+	class ModOperator : Operator, ICanRunAtCompile
 	{
 		public ModOperator ()
 			: base( 3, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Number && Second is Number ) return new Number( (int)( First as Number ).Val % (int)( Second as Number ).Val );
-			if ( !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -441,6 +433,11 @@ namespace Kento
 				return new Number( ( First as Number ).Val % ( Second as Number ).Val );
 			}
 			throw new Exception( "Both operands must be numbers" );
+		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			if ( First is Number && Second is Number ) return new Number( (int)( First as Number ).Val % (int)( Second as Number ).Val );
+			return NoValue.Value;
 		}
 	}
 
@@ -505,36 +502,32 @@ namespace Kento
 		}
 	}
 
-	class InvokeOperator : Operator, IRequiresRuntime
+	class InvokeOperator : Operator
 	{
 		public InvokeOperator ()
 			: base( 1, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
-			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
+			if ( Second is Reference && !( Second is HardReference ) ) Second = ( Second as Reference ).ReferencingValue;
 			Second = Second.ToArray();
 
-			if ( First is Function )
+			if ( First is IFunction )
 			{
-				var toReturn = ( First as Function ).Invoke( ( Second.Clone() as Array ) );
+				var toReturn = ( First as IFunction ).Invoke( ( Second.Clone() as Array ) );
 				return toReturn;
 			}
 			throw new Exception( "First operand must be a function" );
 		}
 	}
-	class MakeCodeBlock : Operator
+	class MakeCodeBlock : Operator, ICanRunAtCompile
 	{
 		public MakeCodeBlock ()
 			: base( 13, OperatorType.PrefixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Identifier && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 
 			if ( First is Expression )
@@ -547,42 +540,39 @@ namespace Kento
 			}
 			throw new Exception( "Operand must be an expression or an expression sequence" );
 		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			return Operate( First, Second );
+		}
 	}
-	class AccessValueAtIndex : Operator, IRequiresRuntime
+	class AccessValueAtIndex : Operator
 	{
 		public AccessValueAtIndex ()
 			: base( 1, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
-			if ( First is Array && Second is Number )
+			if ( First is IIndexable && Second is Number )
 			{
+				var array = First as IIndexable;
 				var index = (int)( Second as Number ).Val;
-				if ( index >= 0 && index < ( First as Array ).Arr.Count )
-				{
-					var toReturn = ( First as Array ).Arr[ index ];
-					return toReturn;
-				}
-				throw new Exception( "Index is out of bounds of the array" );
+				var toReturn = array.GetReferenceAtIndex( index );
+				return toReturn;
 			}
-			throw new Exception( "First operand must be an array and the second one must be a number" );
+			throw new Exception( "First operand must be indexable and the second one must be a number" );
 		}
 	}
 
-	class NotOperator : Operator
+	class NotOperator : Operator, ICanRunAtCompile
 	{
 		public NotOperator ()
 			: base( 2, OperatorType.PrefixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Identifier && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( First is Boolean )
 			{
@@ -590,36 +580,54 @@ namespace Kento
 			}
 			throw new Exception( "Operand must be a boolean" );
 		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			if ( First is Boolean )
+			{
+				return new Boolean( ( First as Boolean ).Val ? false : true );
+			}
+			return NoValue.Value;
+		}
 	}
-	class ReferenceOperator : Operator, IRequiresRuntime
+	class ReferenceOperator : Operator
 	{
 		public ReferenceOperator ()
 			: base( 2, OperatorType.PrefixUnary ) { }
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-
 			if ( First is Reference )
 			{
 				return ( First as Reference ).GetHardReference();
 			}
-			throw new Exception( "Reference operator expects a identifier" );
+			throw new Exception( "Reference operator expects an identifier" );
 		}
 	}
-	class TypeofOperator : Operator, IRequiresRuntime
+	class TypeofOperator : Operator
 	{
 		public TypeofOperator ()
 			: base( 2, OperatorType.PrefixUnary ) { }
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 
 			return new String( First.GetType().ToString() );
 		}
 	}
+	class StaticOperator : Operator
+	{
+		public StaticOperator ()
+			: base( 16, OperatorType.PrefixUnary ) { }
 
-	class NotEqualTo : Operator, IRequiresRuntime
+		public override Value Operate ( Value First, Value Second )
+		{
+			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
+
+			First.Static = true;
+			return First;
+		}
+	}
+
+	class NotEqualTo : Operator
 	{
 		public NotEqualTo ()
 			: base( 7, OperatorType.InfixBinary ) { }
@@ -627,8 +635,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -642,7 +648,7 @@ namespace Kento
 			return new Boolean( true );
 		}
 	}
-	class EqualTo : Operator, IRequiresRuntime
+	class EqualTo : Operator
 	{
 		public EqualTo ()
 			: base( 7, OperatorType.InfixBinary ) { }
@@ -650,8 +656,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -665,7 +669,7 @@ namespace Kento
 			throw new Exception( "Operands are not comparable" );
 		}
 	}
-	class LessThan : Operator, IRequiresRuntime
+	class LessThan : Operator
 	{
 		public LessThan ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -673,8 +677,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -687,7 +689,7 @@ namespace Kento
 			return NoValue.Value;
 		}
 	}
-	class LessOrEqual : Operator, IRequiresRuntime
+	class LessOrEqual : Operator
 	{
 		public LessOrEqual ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -695,8 +697,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -704,7 +704,7 @@ namespace Kento
 			throw new Exception( "Operands must be numbers" );
 		}
 	}
-	class GreaterThan : Operator, IRequiresRuntime
+	class GreaterThan : Operator
 	{
 		public GreaterThan ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -712,15 +712,13 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 			if ( First is Number && Second is Number ) return new Boolean( ( First as Number ).Val > ( Second as Number ).Val );
 			throw new Exception( "Operands must be numbers" );
 		}
 	}
-	class GreaterOrEqual : Operator, IRequiresRuntime
+	class GreaterOrEqual : Operator
 	{
 		public GreaterOrEqual ()
 			: base( 6, OperatorType.InfixBinary ) { }
@@ -728,8 +726,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 			if ( First is Number && Second is Number ) return new Boolean( ( First as Number ).Val >= ( Second as Number ).Val );
@@ -737,7 +733,7 @@ namespace Kento
 		}
 	}
 
-	class LogicalOr : Operator, IRequiresRuntime
+	class LogicalOr : Operator
 	{
 		public LogicalOr ()
 			: base( 12, OperatorType.InfixBinary ) { }
@@ -745,8 +741,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -754,7 +748,7 @@ namespace Kento
 			throw new Exception( "Operands must be boolean" );
 		}
 	}
-	class LogicalAnd : Operator, IRequiresRuntime
+	class LogicalAnd : Operator
 	{
 		public LogicalAnd ()
 			: base( 11, OperatorType.InfixBinary ) { }
@@ -762,8 +756,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			if ( ( First is Identifier || Second is Identifier ) && !Compiler.Runtime ) return NoValue.Value;
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -772,15 +764,13 @@ namespace Kento
 		}
 	}
 
-	class SufixIncrement : Operator, IRequiresRuntime
+	class SufixIncrement : Operator
 	{
 		public SufixIncrement ()
 			: base( 2, OperatorType.SufixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-
 			if ( First is Reference )
 			{
 				if ( ( First as Reference ).ReferencingValue is Number )
@@ -795,15 +785,13 @@ namespace Kento
 			throw new Exception( "Operand must be an identifier" );
 		}
 	}
-	class SufixDecrement : Operator, IRequiresRuntime
+	class SufixDecrement : Operator
 	{
 		public SufixDecrement ()
 			: base( 2, OperatorType.SufixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-
 			if ( First is Reference )
 			{
 				if ( ( First as Reference ).ReferencingValue is Number )
@@ -818,15 +806,13 @@ namespace Kento
 			throw new Exception( "Operand must be an identifier" );
 		}
 	}
-	class PrefixIncrement : Operator, IRequiresRuntime
+	class PrefixIncrement : Operator
 	{
 		public PrefixIncrement ()
 			: base( 2, OperatorType.PrefixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-
 			if ( First is Reference )
 			{
 				if ( ( First as Reference ).ReferencingValue is Number )
@@ -840,15 +826,13 @@ namespace Kento
 			throw new Exception( "Operand must be an identifier" );
 		}
 	}
-	class PrefixDecrement : Operator, IRequiresRuntime
+	class PrefixDecrement : Operator
 	{
 		public PrefixDecrement ()
 			: base( 2, OperatorType.PrefixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-
 			if ( First is Reference )
 			{
 				if ( ( First as Reference ).ReferencingValue is Number )
@@ -874,15 +858,13 @@ namespace Kento
 		}
 	}
 
-	class IfOperator : Operator, IRequiresRuntime
+	class IfOperator : Operator
 	{
 		public IfOperator ()
 			: base( 15, OperatorType.PrefixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -898,15 +880,13 @@ namespace Kento
 			throw new Exception( "Operands must be a boolean and a code block" );
 		}
 	}
-	class ElseOperator : Operator, IRequiresRuntime
+	class ElseOperator : Operator
 	{
 		public ElseOperator ()
 			: base( 16, OperatorType.InfixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -918,15 +898,13 @@ namespace Kento
 			throw new Exception( "Else must be followed by a code block" );
 		}
 	}
-	class WhileOperator : Operator
+	class WhileOperator : Operator, ICanRunAtCompile
 	{
 		public WhileOperator ()
 			: base( 15, OperatorType.PrefixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -937,17 +915,24 @@ namespace Kento
 			}
 			throw new Exception( "Operands must be code blocks" );
 		}
+		public Value CompileTimeOperate ( Value First, Value Second )
+		{
+			if ( First is Expression ) First = new CodeBlock( First as Expression );
+			if ( First is CodeBlock && Second is CodeBlock )
+			{
+				return new Loop( First as CodeBlock, Second as CodeBlock );
+			}
+			return NoValue.Value;
+		}
 	}
 
-	class FunctionOperator : Operator, IRequiresRuntime
+	class FunctionOperator : Operator
 	{
 		public FunctionOperator ()
 			: base( 14, OperatorType.PrefixBinary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
@@ -959,24 +944,22 @@ namespace Kento
 				return new Function( arr, code, Compiler.GetCurrentScope() );
 			}
 			throw new Exception( "Function must be followed by a list and a code block" );
-
 		}
 	}
-	class ClassOperator : Operator, IRequiresRuntime
+	class ClassOperator : Operator
 	{
 		public ClassOperator ()
 			: base( 14, OperatorType.PrefixBinary ) { }
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
 			if ( First is Array && ( First as Array ).Arr.Count == 0 && Second is CodeBlock )
 			{
 				var newType = new Type( ( Second as CodeBlock ) );
-				return newType.Run();
+				newType.Run();
+				return newType;
 			}
 			if ( First is Type && Second is CodeBlock )
 			{
@@ -986,38 +969,33 @@ namespace Kento
 			throw new Exception( "First operand must be a type or an empty list and the second operand must bea code block" );
 		}
 	}
-	class DeclareOperator : Operator, IRequiresRuntime
+	class DeclareOperator : Operator
 	{
 		public DeclareOperator ()
 			: base( 14, OperatorType.PrefixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			if ( First is Identifier )
-			{
-				return ( First as Identifier ).Evaluate();
-			}
-			throw new Exception( "Operand must be an identifier" );
+			return First.Evaluate();
 		}
 	}
-	class NewOperator : Operator, IRequiresRuntime
+	class NewOperator : Operator
 	{
 		public NewOperator ()
-			: base( 4, OperatorType.PrefixUnary ) { }
+			: base( 1, OperatorType.PrefixUnary ) { }
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 
-			if ( First is Type )
+			if ( First is IClass )
 			{
-				return new Instance( ( First as Type ) );
+				return ( First as IClass ).MakeInstance();
 			}
 			throw new Exception( "Operand must be a type" );
 		}
 	}
 
-	class CommaOperator : Operator, IRequiresRuntime
+	class CommaOperator : Operator
 	{
 		public CommaOperator ()
 			: base( 13, OperatorType.InfixBinary ) { }
@@ -1025,8 +1003,6 @@ namespace Kento
 		public override Value Operate ( Value First, Value Second )
 		{
 			bool add = !( First is Identifier );
-			First = First.Evaluate();
-			Second = Second.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 
 			if ( First is Array && add )
@@ -1043,34 +1019,28 @@ namespace Kento
 				( new Reference( Second ) ) );
 		}
 	}
-	class DotOperator : Operator, IRequiresRuntime
+	class DotOperator : Operator
 	{
 		public DotOperator ()
-			: base( 1, OperatorType.InfixBinary ) { }
+			: base( 1, OperatorType.SufixUnary ) { }
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 
-			if ( First is Instance && Second is Identifier )
+			if ( First is IHasMembers )
 			{
-				var inst = First as Instance;
-				var ident = Second as Identifier;
-				if ( inst.Identifiers.ContainsKey( ident.Name ) )
-				{
-					Compiler.SetAsCurrentScope( inst.Identifiers );
-					Second = Second.Evaluate();
-					Compiler.ExitScope( true );
-					return Second as Reference;
-				}
-				throw new Exception( "Instance does not hold that identifiers" );
+				var inst = First as IHasMembers;
+				Compiler.SetAsCurrentScope( inst.Identifiers );
+				Compiler.PendingDot = true;
+				Compiler.PendingDotIsStatic = First is IClass;
+				return NoValue.Value;
 			}
-			throw new Exception( "Operands must be an instance and an identifier" );
+			throw new Exception( "Operand must have members" );
 		}
 	}
 
-	class ReturnOperator : Operator, IRequiresRuntime
+	class ReturnOperator : Operator
 	{
 		public ReturnOperator ()
 			: base( 15, OperatorType.PrefixUnary ) { }
@@ -1080,7 +1050,7 @@ namespace Kento
 			return NoValue.Value;
 		}
 	}
-	class ContinueOperator : Operator, IRequiresRuntime
+	class ContinueOperator : Operator
 	{
 		public ContinueOperator ()
 			: base( 15, OperatorType.Special ) { }
@@ -1090,7 +1060,7 @@ namespace Kento
 			return NoValue.Value;
 		}
 	}
-	class BreakOperator : Operator, IRequiresRuntime
+	class BreakOperator : Operator
 	{
 		public BreakOperator ()
 			: base( 15, OperatorType.Special ) { }
@@ -1101,13 +1071,12 @@ namespace Kento
 		}
 	}
 
-	class RunCodeBlock : Operator, IRequiresRuntime
+	class RunCodeBlock : Operator
 	{
 		public RunCodeBlock ()
 			: base( 0, OperatorType.SufixUnary ) { }
 		public override Value Operate ( Value First, Value Second )
 		{
-			First = First.Evaluate();
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 
 			if ( First is CodeBlock )

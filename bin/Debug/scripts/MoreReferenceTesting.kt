@@ -6,12 +6,12 @@ first.Prop = 5
 
 second = first
 second.Prop = 10
-ConsoleOutput("Normal assignment")
-ConsoleOutput(first.Prop)
-ConsoleOutput(second.Prop)
+Console.Output("Normal assignment")
+Console.Output(first.Prop)
+Console.Output(second.Prop)
 
 second = &first
 second.Prop = 10
-ConsoleOutput("Referential assignment")
-ConsoleOutput(first.Prop)
-ConsoleOutput(second.Prop)
+Console.Output("Referential assignment")
+Console.Output(first.Prop)
+Console.Output(second.Prop)

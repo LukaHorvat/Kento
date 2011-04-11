@@ -2,39 +2,39 @@
 
 namespace Kento
 {
-	class Type : CodeBlock
+	class Type : CodeBlock, IClass
 	{
-		Scope identifiers;
-		public Scope Identifiers
-		{
-			get { return identifiers; }
-			set { identifiers = value; }
-		}
+		public Scope Identifiers { get; set; }
+		public InstanceFlags Flags { get; set; }
 
 		public Type ( Type BaseClass, CodeBlock Code )
-			: base( Code.Value )
-		{
-			identifiers = BaseClass.Identifiers.Clone();
-		}
+			: this( BaseClass, Code.Value ) { }
 		public Type ( Type BaseClass, List<Token> Code )
 			: base( Code )
 		{
-			identifiers = BaseClass.Identifiers.Clone();
+			Identifiers = BaseClass.Identifiers.Clone();
+			Type = CodeBlockType.Type;
 		}
 		public Type ( CodeBlock Code )
 			: base( Code.Value )
 		{
-			identifiers = new Scope();
+			Identifiers = new Scope();
+			Type = CodeBlockType.Type;
 		}
 		public override Value Run ()
 		{
-			Compiler.SetAsCurrentScope( identifiers );
+			Compiler.SetAsCurrentScope( Identifiers );
 			base.Run();
+			Compiler.ExitScope( true );
 			return this;
 		}
 		public override Value Clone ()
 		{
 			return new Type( this, Value );
+		}
+		public Instance MakeInstance ()
+		{
+			return new Instance( this );
 		}
 	}
 }

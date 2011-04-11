@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
-
-namespace Kento
+﻿namespace Kento
 {
-	abstract class ExternalFunction : Function
+	delegate Value ProcessInvoke ( Array Arguments );
+
+	class ExternalFunction : ExternalMember, IFunction
 	{
-		string representation;
-		public string Representation
+		ProcessInvoke function;
+		public ExternalFunction ( string Name, bool Static, ProcessInvoke Function )
 		{
-			get { return representation; }
-			set { representation = value; }
+			this.Static = Static;
+			Representation = Name;
+			function = Function;
 		}
-		public ExternalFunction ( string Name )
-			: base( new Array(), new CodeBlock( new List<Token>() ), Compiler.GlobalScope )
+		public Value Invoke ( Array Arguments )
 		{
-			representation = Name;
+			return function( Arguments );
 		}
 	}
 }

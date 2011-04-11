@@ -1,18 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace Kento
 {
-	class Instance : Value, IInstance
+	[Flags]
+	public enum InstanceFlags
+	{
+		NoFlags = 0x00,
+		Indexable = 0x01
+	}
+
+	public class Instance : Value, IFunction, IHasMembers
 	{
 		public Scope Identifiers { get; set; }
+		public InstanceFlags Flags { get; set; }
 
-		public Instance ( Type Type )
+		public Instance ( IClass Type )
+			: this( Type.Identifiers, Type.Flags ) { }
+
+		public Instance ( InstanceFlags Flags )
+			: this( new Scope(), Flags ) { }
+
+		public Instance ( Scope Identifiers, InstanceFlags Flags )
 		{
-			Identifiers = Type.Identifiers.Clone();
-			RewireFunctions();
-		}
-		public Instance ( Scope Identifiers )
-		{
+			this.Flags = Flags;
 			this.Identifiers = Identifiers.Clone();
 			RewireFunctions();
 		}
@@ -28,7 +38,16 @@ namespace Kento
 		}
 		public override Value Clone ()
 		{
-			return new Instance( Identifiers );
+			return new Instance( Identifiers, Flags );
+		}
+		public virtual Value Invoke ( Array Arguments )
+		{
+			if ( Identifiers.ContainsKey( "Constructor" ) )
+			{
+				var constructor = Identifiers[ "Constructor" ].ReferencingValue;
+				if ( constructor is IFunction ) ( constructor as IFunction ).Invoke( Arguments );
+			}
+			return this;
 		}
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Kento
 {
-	class Function : CodeBlock
+	class Function : CodeBlock, IFunction
 	{
 		List<String> args;
 		private Scope scope;
@@ -14,19 +14,8 @@ namespace Kento
 		}
 
 		public Function ( Array Arguments, CodeBlock Code, Scope Scope )
-			: base( Code.Value )
-		{
-			scope = Scope;
-			args = new List<String>();
-			foreach ( var reference in Arguments.Arr )
-			{
-				if ( reference.ReferencingValue is String )
-				{
-					args.Add( (String)reference.ReferencingValue );
-				} else throw new Exception( "Function requires a list of strings" );
-			}
-			Type = CodeBlockType.Function;
-		}
+			: this( Arguments.ToArray<String>(), Code.Value, Scope ) { }
+
 		public Function ( List<String> Arguments, List<Token> Code, Scope Scope )
 			: base( Code )
 		{

@@ -45,18 +45,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IClass.cs" />
+    <Compile Include="Interfaces\IHasMembers.cs" />
+    <Compile Include="Interfaces\IFunction.cs" />
+    <Compile Include="Interfaces\IIndexable.cs" />
     <Compile Include="Objects\ExpressionSequence.cs" />
-    <Compile Include="IRequiresRuntime.cs" />
+    <Compile Include="ICanRunAtCompile.cs" />
     <Compile Include="Objects\Array.cs" />
     <Compile Include="Objects\Boolean.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="Objects\Expression.cs" />
-    <Compile Include="Objects\Class.cs" />
     <Compile Include="Objects\CodeBlock.cs" />
     <Compile Include="Objects\Function.cs" />
     <Compile Include="Objects\HardReference.cs" />
     <Compile Include="Objects\Identifier.cs" />
-    <Compile Include="Objects\IInstance.cs" />
     <Compile Include="Objects\Instance.cs" />
     <Compile Include="Objects\Literal.cs" />
     <Compile Include="Objects\Loop.cs" />
@@ -69,12 +71,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Objects\String.cs" />
     <Compile Include="Scope.cs" />
-    <Compile Include="Standard Library\ConsoleInput.cs" />
-    <Compile Include="Standard Library\ConsoleOutput.cs" />
+    <Compile Include="Standard Library\Array\SLArray.cs" />
+    <Compile Include="Standard Library\Math\SLMath.cs" />
+    <Compile Include="Standard Library\System\SLConsole.cs" />
+    <Compile Include="Standard Library\ExternalBinding.cs" />
+    <Compile Include="Standard Library\ExternalClass.cs" />
     <Compile Include="Standard Library\ExternalFunction.cs" />
-    <Compile Include="Standard Library\GetExecutionTime.cs" />
-    <Compile Include="Standard Library\MakeArray.cs" />
+    <Compile Include="Standard Library\ExternalMember.cs" />
+    <Compile Include="Standard Library\ExternalProperty.cs" />
+    <Compile Include="Standard Library\ILibrarySegment.cs" />
     <Compile Include="Standard Library\StandardLibrary.cs" />
+    <Compile Include="Standard Library\System\SLConvert.cs" />
+    <Compile Include="Standard Library\System\SLSystem.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="TokenList.cs" />

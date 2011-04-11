@@ -6,6 +6,7 @@ namespace Kento
 	{
 		Function = 0,
 		Loop,
+		Type,
 		Other
 	}
 	class CodeBlock : Value
@@ -71,7 +72,7 @@ namespace Kento
 					}
 				} else
 				{
-					solvingStack.Push( (Value)value[ i ] );
+					solvingStack.Push( ( (Value)value[ i ] ).Evaluate() );
 				}
 				if ( Compiler.Fallthrough != FallThroughType.NoFallthrough )
 				{
@@ -102,7 +103,7 @@ namespace Kento
 			}
 			Value toReturn = NoValue.Value;
 			if ( solvingStack.Count > 0 ) toReturn = solvingStack.Peek().Evaluate();
-			if ( type != CodeBlockType.Loop ) Compiler.ExitScope( this is Type );
+			if ( type != CodeBlockType.Loop && type != CodeBlockType.Type ) Compiler.ExitScope( this is Type );
 			return toReturn;
 		}
 	}

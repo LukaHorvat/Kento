@@ -1,6 +1,0 @@
-﻿namespace Kento
-{
-	interface IRequiresRuntime
-	{
-	}
-}

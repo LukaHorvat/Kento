@@ -1,0 +1,6 @@
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Release\Kento.exe.config
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Release\Kento.exe
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Release\Kento.pdb
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\obj\x86\Release\Kento.exe
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\obj\x86\Release\Kento.pdb

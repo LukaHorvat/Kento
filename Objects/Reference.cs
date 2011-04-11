@@ -2,33 +2,37 @@
 {
 	public class Reference : Value
 	{
-		protected int index;
+		protected int Index;
 		public Value ReferencingValue
 		{
-			get { return Compiler.GetValue( index ); }
-			set { Compiler.SetValue( index, value ); }
+			get
+			{
+				var toReturn = Compiler.GetValue( Index );
+				if ( toReturn is ExternalProperty ) toReturn = toReturn.Evaluate();
+				return toReturn;
+			}
+			set { Compiler.SetValue( Index, value ); }
 		}
 
 		public Reference ( Value ValueToReference )
-		{
-			index = Compiler.StoreValue( ValueToReference );
-			Compiler.RegisterReference( this, index );
-		}
+			: this( Compiler.StoreValue( ValueToReference ) ) { }
+
 		public Reference ( int Index )
 		{
-			index = Index;
-			if ( index != -1 ) //NullReference case
-				Compiler.RegisterReference( this, index );
+			Static = Compiler.GetValue( Index ).Static;
+			this.Index = Index;
+			if ( this.Index != -1 ) //NullReference case
+				Compiler.RegisterReference( this, this.Index );
 		}
 		public void ChangeReference ( Reference Reference )
 		{
-			index = Reference.index;
+			Index = Reference.Index;
 		}
 		public void ChangeReference ( int Index )
 		{
 			Dereference();
-			index = Index;
-			Compiler.RegisterReference( this, index );
+			this.Index = Index;
+			Compiler.RegisterReference( this, this.Index );
 		}
 		public override Value Clone ()
 		{
@@ -36,12 +40,27 @@
 		}
 		public HardReference GetHardReference ()
 		{
-			return new HardReference( index );
+			return new HardReference( Index );
 		}
 		public virtual void Dereference ()
 		{
-			Compiler.Deference( this, index );
-			index = -1;
+			Compiler.Deference( this, Index );
+			Index = -1;
+		}
+		public override bool Equals ( object Obj )
+		{
+			var reference = Obj as Reference;
+			if ( reference != null )
+			{
+				int myIndex = Index;
+				int referenceIndex = reference.Index;
+				return myIndex == referenceIndex;
+			}
+			return false;
+		}
+		public override int GetHashCode ()
+		{
+			return Index;
 		}
 	}
 	class NullReference : Reference

@@ -9,11 +9,15 @@
 		}
 		public override Value Clone ()
 		{
-			return new Reference( index );
+			return new Reference( Index );
 		}
 		public void ForceFree ()
 		{
-			Compiler.FreeMemory( index );
+			Compiler.FreeMemory( Index );
+		}
+		public override Array ToArray ()
+		{
+			return new Array( this );
 		}
 	}
 }

@@ -1,12 +1,13 @@
 Geometry = class () {
-	Circumference = function ("Circle") {
-		return 2 * Circle.Radius * 3.1415
+	static Circumference = function ("Circle") {
+		return 2 * Circle.Radius * Math.PI
 	}
 }
 Circle = class () {
-	Radius = 0
+	declare Radius
+	Constructor = function ("R") {
+		Radius = R
+	}
 }
-geo = new Geometry
-circle = new Circle
-circle.Radius = 10
-ConsoleOutput(geo.Circumference(circle))
+circle = new Circle(10)
+Console.Output( Geometry.Circumference( circle ) )

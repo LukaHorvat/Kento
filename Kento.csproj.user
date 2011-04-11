@@ -4,6 +4,6 @@
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <StartArguments>"C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Debug\scripts\FirstTestScript.kt"</StartArguments>
+    <StartArguments>"C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Debug\scripts\ArrayTests.kt"</StartArguments>
   </PropertyGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace Kento
 {
@@ -26,8 +26,13 @@ namespace Kento
 				var reference = Compiler.Identify( Name );
 				if ( reference == NullReference.Value )
 				{
-					reference = new Reference( new NoValue() );
+					reference = Compiler.Reserve();
 					Compiler.SetAlias( Name, reference );
+				}
+				if ( Compiler.PendingDot )
+				{
+					Compiler.PendingDot = false;
+					Compiler.ExitScope( true );
 				}
 				return reference;
 			}

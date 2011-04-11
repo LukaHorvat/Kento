@@ -1,7 +1,7 @@
-Array = MakeArray(100)
+Arr = new Array(100)
 i = 0
 while (i < 100) {
-	Array[i] = GetTime()
+	Arr[i] = System.GetTime()
 	++i
 }
 declare temp
@@ -9,13 +9,13 @@ i = 0
 while (i < 100) {
 	j = i
 	while (j < 100) {
-		if (Array[i] < Array[j]) {
-			temp &= Array[i]
-			Array[i] &= Array[j]
-			Array[j] &= temp
+		if (Arr[i] < Arr[j]) {
+			temp &= Arr[i]
+			Arr[i] &= Arr[j]
+			Arr[j] &= temp
 		}
 		++j
 	}
 	++i
 }
-ConsoleOutput(GetTime())
+Console.Output(System.GetTime())

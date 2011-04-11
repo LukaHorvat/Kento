@@ -1,21 +1,13 @@
-Array = MakeArray(100)
-i = 0
-while (i < 100) {
-	Array[i] = GetTime()
-	++i
-}
-declare temp
-i = 0
-while (i < 100) {
-	j = i
-	while (j < 100) {
-		if (Array[i] < Array[j]) {
-			temp &= Array[i]
-			Array[i] &= Array[j]
-			Array[j] &= temp
-		}
-		++j
+Geometry = class () {
+	static Circumference = function ("Circle") {
+		return 2 * Circle.Radius * Math.PI
 	}
-	++i
 }
-ConsoleOutput(GetTime())
+Circle = class () {
+	declare Radius
+	Constructor = function ("R") {
+		Radius = R
+	}
+}
+circle = new Circle(10)
+Console.Output( Geometry.Circumference( circle ) )

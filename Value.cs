@@ -20,6 +20,7 @@ namespace Kento
 		{
 			return this;
 		}
+		public virtual bool Static { get; set; }
 	}
 	class NoValue : Value
 	{

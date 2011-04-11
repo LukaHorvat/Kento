@@ -1,18 +1,18 @@
 Animal = class () {
 	Live = function () {
-		ConsoleOutput("The animal called " + Name + " lives")
+		Console.Output("The animal called " + Name + " lives")
 	}
 }
 Fish = class Animal {
 	Name = "Goldy" 
 	Swim = function () {
-		ConsoleOutput("The fish swims")
+		Console.Output("The fish swims")
 	}
 }
 Bird = class Animal {
 	Name = "Tweety"
 	Fly = function () {
-		ConsoleOutput("The bird flies")
+		Console.Output("The bird flies")
 	}
 }
 bird = new Bird

@@ -48,6 +48,9 @@ namespace Kento
 			set { fallthrough = value; }
 		}
 
+		public static bool PendingDot { get; set; }
+		public static bool PendingDotIsStatic { get; set; }
+
 		public static Value GetValue ( int Index )
 		{
 			Value result = NoValue.Value;
@@ -156,7 +159,8 @@ namespace Kento
 		}
 		public static void Run ( List<Token> Code )
 		{
-			var defaultScope = Compiler.LoadStandardLibrary();
+			StandardLibrary.Load();
+			var defaultScope = StandardLibrary.Library;
 			GlobalScope = defaultScope;
 			scopeList.AddLast( defaultScope );
 
@@ -166,20 +170,6 @@ namespace Kento
 			new CodeBlock( Code ).Run();
 
 			timer.Stop();
-		}
-		public static Scope LoadStandardLibrary ()
-		{
-			var lib = new Scope();
-			var asm = Assembly.GetExecutingAssembly();
-			var externalFunctions = asm.GetTypes().Where( x => x.IsSubclassOf( typeof( ExternalFunction ) ) );
-
-			foreach ( System.Type fn in externalFunctions )
-			{
-				ExternalFunction instance = ( Activator.CreateInstance( fn ) as ExternalFunction );
-				lib[ instance.Representation ] = new Reference( instance );
-			}
-
-			return lib;
 		}
 		public static void RunFromFile ( string Path, RuntimeFlags Options )
 		{
@@ -194,6 +184,21 @@ namespace Kento
 		{
 			Run( Tokenizer.ParseInfixString( Code ).Tokenize() );
 			if ( ( Options & RuntimeFlags.Debug ) == RuntimeFlags.Debug ) Profiler.OutputTime();
+		}
+		internal static Reference Reserve ()
+		{
+			int index;
+			if ( availabilityStack.Count > 0 )
+			{
+				index = availabilityStack.Pop();
+				memory[ index ] = NoValue.Value;
+			} else
+			{
+				index = memory.Count;
+				memory.Add( NoValue.Value );
+				referenceList.Add( new LinkedList<Reference>() );
+			}
+			return new Reference( index );
 		}
 	}
 }

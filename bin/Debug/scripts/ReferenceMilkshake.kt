@@ -15,6 +15,6 @@ myMilkshake = new Milkshake
 myMilkshake.Bring(Boys, &Yard)
 i=0
 while (i<3) {
-	ConsoleOutput(Yard[i] + " " + typeof Yard[i])
+	Console.Output(Yard[i] + " " + typeof Yard[i])
 	i++
 }
