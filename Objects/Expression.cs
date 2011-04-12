@@ -47,11 +47,13 @@ namespace Kento
 					if ( node.Value is Operator )
 					{
 						var oper = (Operator)node.Value;
+						var type = oper.Type;
 						if ( oper.Precedance == i )
 						{
 							var temp = new TokenList();
 							TokenListNode left = new TokenListNode(), right = new TokenListNode();
-							switch ( oper.Type )//Using the operators type, determines which tokens to make a value from
+							if ( oper is DotOperator ) type = OperatorType.InfixBinary;
+							switch ( type )//Using the operators type, determines which tokens to make a value from
 							{
 								case OperatorType.InfixBinary: //A + B
 									temp.Add( node.Previous.Value );
@@ -87,7 +89,7 @@ namespace Kento
 									right = node.Next;
 									break;
 							}
-							var val = MakeValue( temp, ( oper.Type == OperatorType.PrefixUnary || oper.Type == OperatorType.SufixUnary ) );
+							var val = MakeValue( temp, ( type == OperatorType.PrefixUnary || type == OperatorType.SufixUnary ) );
 							List.Insert( new TokenListNode( val ), left, right );
 						}
 					}
@@ -155,11 +157,19 @@ namespace Kento
 		public override List<Token> Tokenize ()
 		{
 			var rpn = new List<Token>();
-			if ( first is Expression ) rpn.AddRange( ( first as Expression ).Tokenize() );
-			else rpn.Add( first );
-			if ( second is Expression ) rpn.AddRange( ( second as Expression ).Tokenize() );
-			else if ( !( second is NoValue ) ) rpn.Add( second );
-			rpn.Add( op );
+			if ( op is DotOperator ) //Special case for the dot operator which needs to be arranged like a sufix unary
+			{
+				rpn.Add( first );
+				rpn.Add( op );
+				rpn.Add( second );
+			} else
+			{
+				if ( first is Expression || first is ExpressionSequence ) rpn.AddRange( first.Tokenize() );
+				else rpn.Add( first );
+				if ( second is Expression || second is ExpressionSequence ) rpn.AddRange( second.Tokenize() );
+				else if ( !( second is NoValue ) ) rpn.Add( second );
+				rpn.Add( op );
+			}
 
 			return rpn;
 		}

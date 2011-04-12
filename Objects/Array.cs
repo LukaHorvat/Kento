@@ -8,28 +8,27 @@ namespace Kento
 	public class Array : Instance, IIndexable
 	{
 		List<int> dimensions;
-		List<Reference> arr;
 
-		public List<Reference> Arr
-		{
-			get { return arr; }
-			set { arr = value; }
-		}
-
-		public Array ( params Reference[] Values )
-			: this( Values.ToList() ) { }
+		public List<Reference> Arr { get; set; }
 
 		public Array ()
-			: this( new List<Reference>() ) { }
+			: this( new List() ) { }
+
+		public Array ( Value Single )
+			: this( new List( Single ) ) { }
+
+		public Array ( List List )
+			: this( List.Arr.Select( X => new Reference( X ) ).ToList() ) { }
 
 		public Array ( List<Reference> List )
 			: base( InstanceFlags.Indexable )
 		{
-			arr = List;
+			Arr = List;
 			Identifiers[ "Count" ] = new Reference( new ExternalProperty( "Count", false, Count ) );
 			Identifiers[ "Add" ] = new Reference( new ExternalFunction( "Add", false, Add ) );
 			Identifiers[ "Remove" ] = new Reference( new ExternalFunction( "Remove", false, Remove ) );
 			Identifiers[ "RemoveAt" ] = new Reference( new ExternalFunction( "RemoveAt", false, RemoveAt ) );
+			Identifiers[ "Insert" ] = new Reference( new ExternalFunction( "Insert", false, Insert ) );
 		}
 		#region Members
 		public Value Count ()
@@ -77,16 +76,18 @@ namespace Kento
 		}
 		public Value Insert ( Array Arguments )
 		{
-			for ( int i = 0 ; i < Arguments.Arr.Count ; i++ )
+			var first = Arguments.Arr[ 0 ].ReferencingValue;
+			int index;
+			if ( first is Number )
 			{
-				var reference = Arguments.Arr[ i ];
-				var value = reference.ReferencingValue;
-				if ( value is Number )
-				{
-					int index = (int)( value as Number ).Val;
-					Arr.RemoveAt( index );
-				}
-			}
+				index = (int)( ( first as Number ).Val );
+			} else throw new Exception( "First parameter must be a number" );
+
+			var second = Arguments.Arr[ 1 ];
+			if ( index >= 0 && index < Arr.Count )
+			{
+				Arr.Insert( index, second );
+			} else throw new Exception( "Index is out of bounds" );
 			return this;
 		}
 		#endregion
@@ -110,13 +111,13 @@ namespace Kento
 		}
 		public Reference GetReferenceAtIndex ( int Index )
 		{
-			if ( Index >= 0 && Index < arr.Count )
-				return arr[ Index ];
+			if ( Index >= 0 && Index < Arr.Count )
+				return Arr[ Index ];
 			throw new Exception( "Index out of bounds" );
 		}
 		public override Value Clone ()
 		{
-			var list = arr.Select( Val => ( Val.Clone() as Reference ) ).ToList();
+			var list = Arr.Select( Val => ( Val.Clone() as Reference ) ).ToList();
 			return new Array( list );
 		}
 		public override Value Invoke ( Array Arguments )

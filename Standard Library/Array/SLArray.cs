@@ -10,7 +10,6 @@
 
 		public ExternalClass Load ()
 		{
-
 			return new SLArray();
 		}
 

@@ -30,17 +30,14 @@ namespace Kento
 			get { return noValue; }
 			set { noValue = value; }
 		}
-		public override Value Evaluate ()
+	}
+	class Nothing : Value
+	{
+		static Nothing val = new Nothing();
+		public static Nothing Value
 		{
-			return Value;
-		}
-		public override List<Token> Tokenize ()
-		{
-			return new List<Token>( new Token[] { (Token)this } );
-		}
-		public override Value Clone ()
-		{
-			return Value;
+			get { return val; }
+			set { val = value; }
 		}
 	}
 }

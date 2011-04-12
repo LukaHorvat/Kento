@@ -68,7 +68,8 @@ namespace Kento
 							second = solvingStack.Pop();
 						}
 						var result = op.Operate( solvingStack.Pop(), second );
-						solvingStack.Push( result );
+						if ( result != Nothing.Value )
+							solvingStack.Push( result );
 					}
 				} else
 				{

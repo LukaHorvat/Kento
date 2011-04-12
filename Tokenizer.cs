@@ -56,7 +56,8 @@ namespace Kento
 						Func<BracketType, bool> fn = ( x => Operators.RepresentationDictionary[ x.OpeningBracket ] == str );
 						if ( Operators.Brackets.Any( fn ) )
 						{
-							tokens.Add( (Token)Activator.CreateInstance( Operators.Brackets.First( fn ).SpecialOperator ) );
+							if ( str == "[" && !( tokens.Last.Value is Identifier ) ) tokens.Add( new MakeArray() );
+							else tokens.Add( (Token)Activator.CreateInstance( Operators.Brackets.First( fn ).SpecialOperator ) );
 							tokens.Add( new ParenthesisOpen() );
 						} else if ( Operators.Brackets.Any( x => Operators.RepresentationDictionary[ x.ClosingBracket ] == str ) )
 						{

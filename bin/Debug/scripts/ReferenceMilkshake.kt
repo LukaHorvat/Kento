@@ -1,6 +1,5 @@
 Milkshake = class () {
 	Bring = function ("Boys", "Yard") {
-		Yard &= Yard
 		i=0
 		while (i<3) {
 			Yard[i]=Boys[i]
@@ -8,8 +7,8 @@ Milkshake = class () {
 		}
 	}
 }
-Boys = "Boy1","Boy2","Boy3"
-Yard = "", "", ""
+Boys = ["Boy1","Boy2","Boy3"]
+Yard = ["", "", ""]
 
 myMilkshake = new Milkshake
 myMilkshake.Bring(Boys, &Yard)
@@ -18,3 +17,4 @@ while (i<3) {
 	Console.Output(Yard[i] + " " + typeof Yard[i])
 	i++
 }
+Console.Output(System.GetTime())

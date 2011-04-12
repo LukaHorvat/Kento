@@ -15,7 +15,10 @@
 		}
 
 		public Reference ( Value ValueToReference )
-			: this( Compiler.StoreValue( ValueToReference ) ) { }
+			: this( ValueToReference is Reference ? ( ValueToReference as Reference ).Index : Compiler.StoreValue( ValueToReference ) ) { }
+
+		public Reference ( Reference Reference )
+			: this( Reference.Index ) { }
 
 		public Reference ( int Index )
 		{
@@ -61,6 +64,10 @@
 		public override int GetHashCode ()
 		{
 			return Index;
+		}
+		public override string ToString ()
+		{
+			return ReferencingValue.ToString();
 		}
 	}
 	class NullReference : Reference

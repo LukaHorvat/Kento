@@ -60,6 +60,7 @@
     <Compile Include="Objects\HardReference.cs" />
     <Compile Include="Objects\Identifier.cs" />
     <Compile Include="Objects\Instance.cs" />
+    <Compile Include="Objects\List.cs" />
     <Compile Include="Objects\Literal.cs" />
     <Compile Include="Objects\Loop.cs" />
     <Compile Include="Objects\Number.cs" />

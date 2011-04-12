@@ -16,7 +16,7 @@
 		Token value;
 		public Token Value
 		{
-			get { return this.value; }
+			get { return value; }
 			set { this.value = value; }
 		}
 		public TokenListNode ( Token Token )

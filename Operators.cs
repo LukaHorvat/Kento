@@ -130,9 +130,9 @@ namespace Kento
 			representationDictionary.Add( typeof( PrefixDecrement ), "--" );
 			representationDictionary.Add( typeof( SufixIncrement ), "++" );
 			representationDictionary.Add( typeof( PrefixIncrement ), "++" );
-			representationDictionary.Add( typeof( InvokeOperator ), "invoke!" );
-			representationDictionary.Add( typeof( MakeCodeBlock ), "makeCB!" );
-			representationDictionary.Add( typeof( AccessValueAtIndex ), "index!" );
+			representationDictionary.Add( typeof( InvokeOperator ), "InvokeOperator" );
+			representationDictionary.Add( typeof( MakeCodeBlock ), "MakeCodeBlock" );
+			representationDictionary.Add( typeof( AccessValueAtIndex ), "SquareBracketsOperator" );
 
 			LowestPrecedance = representationDictionary.Keys.Max( X => ( (Operator)Activator.CreateInstance( X ) ).Precedance );
 
@@ -283,7 +283,6 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-
 			if ( First is Reference && Second is Reference )
 			{
 				( First as Reference ).ChangeReference( Second as Reference );
@@ -304,7 +303,10 @@ namespace Kento
 
 			if ( First is Reference )
 			{
-				var toSet = clone ? Second.Clone() : Second;
+				Value toSet;
+				if ( Second is List ) toSet = Second.ToArray();
+				else toSet = clone ? Second.Clone() : Second;
+
 				( First as Reference ).ReferencingValue = toSet;
 				return toSet;
 			}
@@ -543,6 +545,16 @@ namespace Kento
 		public Value CompileTimeOperate ( Value First, Value Second )
 		{
 			return Operate( First, Second );
+		}
+	}
+	class MakeArray : Operator
+	{
+		public MakeArray ()
+			: base( 13, OperatorType.PrefixUnary ) { }
+
+		public override Value Operate ( Value First, Value Second )
+		{
+			return First.ToArray();
 		}
 	}
 	class AccessValueAtIndex : Operator
@@ -1002,21 +1014,12 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			bool add = !( First is Identifier );
-			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
-
-			if ( First is Array && add )
+			if ( First is List )
 			{
-				if ( Second is Reference )
-				{
-					( First as Array ).Arr.Add( Second as Reference );
-				} else
-					( First as Array ).Arr.Add( new Reference( Second ) );
+				( First as List ).Arr.Add( Second.Clone() );
 				return First;
 			}
-			return new Array( new Reference( First ), ( Second is Reference ) ?
-				( Second as Reference ) :
-				( new Reference( Second ) ) );
+			return new List( First.Clone(), Second.Clone() );
 		}
 	}
 	class DotOperator : Operator
@@ -1034,7 +1037,7 @@ namespace Kento
 				Compiler.SetAsCurrentScope( inst.Identifiers );
 				Compiler.PendingDot = true;
 				Compiler.PendingDotIsStatic = First is IClass;
-				return NoValue.Value;
+				return Nothing.Value;
 			}
 			throw new Exception( "Operand must have members" );
 		}

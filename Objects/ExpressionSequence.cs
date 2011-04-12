@@ -14,7 +14,7 @@ namespace Kento
 			var returnList = new List<Token>();
 			for ( var node = list.First; node != null ; node = node.Next )
 			{
-				returnList.AddRange( ( node.Value as Value ).Tokenize() );
+				returnList.AddRange( ( (Value) node.Value ).Tokenize() );
 			}
 			return returnList;
 		}
