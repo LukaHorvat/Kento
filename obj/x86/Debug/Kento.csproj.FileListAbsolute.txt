@@ -4,3 +4,5 @@ C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Debug\Kento.
 C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\obj\x86\Debug\Kento.exe
 C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\obj\x86\Debug\Kento.pdb
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Debug\OpenTK.dll
+C:\Users\Luka\Documents\Visual Studio 2010\Projects\Kento\Kento\bin\Debug\OpenTK.xml

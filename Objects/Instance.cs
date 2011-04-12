@@ -11,43 +11,54 @@ namespace Kento
 
 	public class Instance : Value, IFunction, IHasMembers
 	{
-		public Scope Identifiers { get; set; }
-		public InstanceFlags Flags { get; set; }
+		public Instance(IClass Type)
+			: this(Type.Identifiers, Type.Flags) {}
 
-		public Instance ( IClass Type )
-			: this( Type.Identifiers, Type.Flags ) { }
+		public Instance(InstanceFlags Flags)
+			: this(new Scope(), Flags) {}
 
-		public Instance ( InstanceFlags Flags )
-			: this( new Scope(), Flags ) { }
-
-		public Instance ( Scope Identifiers, InstanceFlags Flags )
+		public Instance(Scope Identifiers, InstanceFlags Flags)
 		{
 			this.Flags = Flags;
 			this.Identifiers = Identifiers.Clone();
 			RewireFunctions();
 		}
-		void RewireFunctions ()
+
+		#region IFunction Members
+
+		public virtual Value Invoke(Array Arguments)
 		{
-			foreach ( var pair in Identifiers )
+			if (Identifiers.ContainsKey("Constructor"))
 			{
-				if ( pair.Value.ReferencingValue is Function )
+				Value constructor = Identifiers["Constructor"].ReferencingValue;
+				if (constructor is IFunction) (constructor as IFunction).Invoke(Arguments);
+			}
+			return this;
+		}
+
+		#endregion
+
+		#region IHasMembers Members
+
+		public Scope Identifiers { get; set; }
+		public InstanceFlags Flags { get; set; }
+
+		#endregion
+
+		private void RewireFunctions()
+		{
+			foreach (var pair in Identifiers)
+			{
+				if (pair.Value.ReferencingValue is Function)
 				{
-					( pair.Value.ReferencingValue as Function ).Scope = Identifiers;
+					(pair.Value.ReferencingValue as Function).Scope = Identifiers;
 				}
 			}
 		}
-		public override Value Clone ()
+
+		public override Value Clone()
 		{
-			return new Instance( Identifiers, Flags );
-		}
-		public virtual Value Invoke ( Array Arguments )
-		{
-			if ( Identifiers.ContainsKey( "Constructor" ) )
-			{
-				var constructor = Identifiers[ "Constructor" ].ReferencingValue;
-				if ( constructor is IFunction ) ( constructor as IFunction ).Invoke( Arguments );
-			}
-			return this;
+			return new Instance(Identifiers, Flags);
 		}
 	}
 }

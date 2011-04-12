@@ -5,21 +5,22 @@ namespace Kento
 {
 	public class List : Value
 	{
-		public List<Value> Arr { get; set; }		
-		
-		public List ( params Value[] Values )
-			: this( Values.ToList() ) { }
+		public List(params Value[] Values)
+			: this(Values.ToList()) {}
 
-		public List ()
-			: this( new List<Value>() ) { }
+		public List()
+			: this(new List<Value>()) {}
 
-		public List ( List<Value> List )
+		public List(List<Value> List)
 		{
 			Arr = List;
 		}
-		public override Array ToArray ()
+
+		public List<Value> Arr { get; set; }
+
+		public override Array ToArray()
 		{
-			return new Array( this );
+			return new Array(this);
 		}
 	}
 }

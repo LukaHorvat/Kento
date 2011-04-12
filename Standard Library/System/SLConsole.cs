@@ -2,27 +2,33 @@
 
 namespace Kento
 {
-	class SLConsole : ILibrarySegment
+	internal class SLConsole : ILibrarySegment
 	{
-		public ExternalClass Load ()
-		{
-			var output = new ExternalFunction( "Output", true, Output );
-			var input = new ExternalFunction( "Input", true, Input );
+		#region ILibrarySegment Members
 
-			return new ExternalClass( "Console", InstanceFlags.NoFlags, output, input );
-		}
-		public Value Output ( Array Arguments )
+		public ExternalClass Load()
 		{
-			foreach ( var val in Arguments.Arr )
+			var output = new ExternalFunction("Output", true, Output);
+			var input = new ExternalFunction("Input", true, Input);
+
+			return new ExternalClass("Console", InstanceFlags.NoFlags, output, input);
+		}
+
+		#endregion
+
+		public Value Output(Array Arguments)
+		{
+			foreach (Reference val in Arguments.Arr)
 			{
-				Console.Write( val.ReferencingValue.ToString() );
+				Console.Write(val.ReferencingValue.ToString());
 			}
 			Console.WriteLine();
 			return NoValue.Value;
 		}
-		public Value Input ( Array Arguments )
+
+		public Value Input(Array Arguments)
 		{
-			return new String( Console.ReadLine() );
+			return new String(Console.ReadLine());
 		}
 	}
 }

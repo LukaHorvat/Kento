@@ -1,31 +1,17 @@
 ﻿namespace Kento
 {
-	class TokenListNode
+	internal class TokenListNode
 	{
-		TokenListNode next, previous;
-		public TokenListNode Next
+		public TokenListNode(Token Token)
 		{
-			get { return next; }
-			set { next = value; }
+			Value = Token;
 		}
-		public TokenListNode Previous
-		{
-			get { return previous; }
-			set { previous = value; }
-		}
-		Token value;
-		public Token Value
-		{
-			get { return value; }
-			set { this.value = value; }
-		}
-		public TokenListNode ( Token Token )
-		{
-			value = Token;
-		}
-		public TokenListNode ()
-		{
 
-		}
+		public TokenListNode() {}
+		public TokenListNode Next { get; set; }
+
+		public TokenListNode Previous { get; set; }
+
+		public Token Value { get; set; }
 	}
 }

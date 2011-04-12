@@ -5,41 +5,53 @@ namespace Kento
 {
 	public abstract class Value : Token, IComparable<Value>
 	{
-		public virtual Value Evaluate ()
-		{
-			return this;
-		}
-		public virtual Array ToArray ()
-		{
-			return new Array( new Reference( this ) );
-		}
-		public virtual List<Token> Tokenize ()
-		{
-			return new List<Token>( new [] { (Token)this } );
-		}
-		public virtual Value Clone ()
-		{
-			return this;
-		}
 		public virtual bool Static { get; set; }
 
-		public virtual int CompareTo ( Value Other )
+		#region IComparable<Value> Members
+
+		public virtual int CompareTo(Value Other)
 		{
 			return -1;
 		}
+
+		#endregion
+
+		public virtual Value Evaluate()
+		{
+			return this;
+		}
+
+		public virtual Array ToArray()
+		{
+			return new Array(new Reference(this));
+		}
+
+		public virtual List<Token> Tokenize()
+		{
+			return new List<Token>(new[]{(Token) this});
+		}
+
+		public virtual Value Clone()
+		{
+			return this;
+		}
 	}
-	class NoValue : Value
+
+	internal class NoValue : Value
 	{
-		static NoValue noValue = new NoValue();
+		private static NoValue noValue = new NoValue();
+
 		public static NoValue Value
 		{
 			get { return noValue; }
 			set { noValue = value; }
 		}
 	}
-	class Nothing : Value
+
+	internal class Nothing : Value
 	{
-		static Nothing val = new Nothing();
+		private static Nothing val = new Nothing();
+
 		public static Nothing Value
 		{
 			get { return val; }

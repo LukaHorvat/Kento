@@ -1,6 +1,4 @@
 ﻿namespace Kento
 {
-	abstract class Literal : Variable
-	{
-	}
+	internal abstract class Literal : Variable {}
 }

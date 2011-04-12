@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Kento
+﻿namespace Kento
 {
-	delegate Value EvaluateBinding ();
+	internal delegate Value EvaluateBinding();
 
-	class ExternalProperty : ExternalMember
+	internal class ExternalProperty : ExternalMember
 	{
-		readonly EvaluateBinding getter;
-		public ExternalProperty ( string Name, bool Static, EvaluateBinding Getter )
+		private readonly EvaluateBinding getter;
+
+		public ExternalProperty(string Name, bool Static, EvaluateBinding Getter)
 		{
 			this.Static = Static;
 			Representation = Name;
 			getter = Getter;
 		}
-		public override Value Evaluate ()
+
+		public override Value Evaluate()
 		{
-			var toReturn = getter();
+			Value toReturn = getter();
 			toReturn.Static = Static;
 			return toReturn;
 		}

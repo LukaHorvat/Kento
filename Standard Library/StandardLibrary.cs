@@ -3,26 +3,30 @@ using System.Reflection;
 
 namespace Kento
 {
-	class StandardLibrary
+	internal class StandardLibrary
 	{
-		static readonly Scope library = new Scope();
-		static public Scope Library { get { return library; } }
+		private static readonly Scope library = new Scope();
 
-		public static void AddClass ( ExternalClass Class, string Binding )
+		public static Scope Library
 		{
-			library[ Binding ] = new Reference( Class );
+			get { return library; }
 		}
 
-		public static void Load ()
+		public static void AddClass(ExternalClass Class, string Binding)
 		{
-			var asm = Assembly.GetCallingAssembly();
-			foreach ( var type in asm.GetTypes() )
+			library[Binding] = new Reference(Class);
+		}
+
+		public static void Load()
+		{
+			Assembly asm = Assembly.GetCallingAssembly();
+			foreach (System.Type type in asm.GetTypes())
 			{
-				if ( type.GetInterface( "ILibrarySegment" ) != null )
+				if (type.GetInterface("ILibrarySegment") != null)
 				{
-					var segment = Activator.CreateInstance( type ) as ILibrarySegment;
-					var extClass = ( segment ).Load();
-					AddClass( extClass, extClass.Representation );
+					var segment = Activator.CreateInstance(type) as ILibrarySegment;
+					ExternalClass extClass = (segment).Load();
+					AddClass(extClass, extClass.Representation);
 				}
 			}
 		}

@@ -1,6 +1,7 @@
-﻿namespace Kento {
+﻿namespace Kento
+{
 	public interface IFunction
 	{
-		Value Invoke ( Array Arguments );
+		Value Invoke(Array Arguments);
 	}
 }

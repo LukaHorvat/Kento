@@ -2,6 +2,6 @@
 {
 	public interface IClass : IHasMembers
 	{
-		Instance MakeInstance ();
+		Instance MakeInstance();
 	}
 }

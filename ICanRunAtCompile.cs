@@ -1,7 +1,7 @@
 ﻿namespace Kento
 {
-	interface ICanRunAtCompile
+	internal interface ICanRunAtCompile
 	{
-		Value CompileTimeOperate ( Value First, Value Second );
+		Value CompileTimeOperate(Value First, Value Second);
 	}
 }

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Kento
+﻿namespace Kento
 {
-	interface IIndexable
+	internal interface IIndexable
 	{
-		Reference GetReferenceAtIndex ( int Index );
+		Reference GetReferenceAtIndex(int Index);
 	}
 }

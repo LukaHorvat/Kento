@@ -1,26 +1,29 @@
-﻿using System.Diagnostics;
-using System;
+﻿using System;
+using System.Diagnostics;
 
 namespace Kento.Utility
 {
-	class Profiler
+	internal class Profiler
 	{
-		static readonly Stopwatch timer = Stopwatch.StartNew();
-		static long elapsedTime;
-		static long lastStart;
-		public static void StartTimer ()
+		private static readonly Stopwatch timer = Stopwatch.StartNew();
+		private static long elapsedTime;
+		private static long lastStart;
+
+		public static void StartTimer()
 		{
 			lastStart = timer.ElapsedTicks;
 		}
-		public static void StopTimer ()
+
+		public static void StopTimer()
 		{
 			elapsedTime += timer.ElapsedTicks - lastStart;
 			lastStart = timer.ElapsedTicks;
 		}
-		public static void OutputTime ()
+
+		public static void OutputTime()
 		{
 			timer.Stop();
-			Console.WriteLine( "Total time (Utility.Profiler): " + elapsedTime / (double)Stopwatch.Frequency * 1000 );
+			Console.WriteLine("Total time (Utility.Profiler): " + elapsedTime/(double) Stopwatch.Frequency*1000);
 		}
 	}
 }

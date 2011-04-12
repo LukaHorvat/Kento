@@ -2,22 +2,22 @@
 {
 	public class HardReference : Reference
 	{
-		public HardReference ( int Index )
-			: base( Index )
-		{
+		public HardReference(int Index)
+			: base(Index) {}
 
-		}
-		public override Value Clone ()
+		public override Value Clone()
 		{
-			return new Reference( Index );
+			return new Reference(Index);
 		}
-		public void ForceFree ()
+
+		public void ForceFree()
 		{
-			Compiler.FreeMemory( Index );
+			Compiler.FreeMemory(Index);
 		}
-		public override Array ToArray ()
+
+		public override Array ToArray()
 		{
-			return new Array( this );
+			return new Array(this);
 		}
 	}
 }

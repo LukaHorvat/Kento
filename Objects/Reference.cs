@@ -3,57 +3,64 @@
 	public class Reference : Value
 	{
 		protected int Index;
+
+		public Reference(Value ValueToReference)
+			: this(ValueToReference is Reference ? (ValueToReference as Reference).Index : Compiler.StoreValue(ValueToReference)) {}
+
+		public Reference(Reference Reference)
+			: this(Reference.Index) {}
+
+		public Reference(int Index)
+		{
+			Static = Compiler.GetValue(Index).Static;
+			this.Index = Index;
+			if (this.Index != -1) //NullReference case
+				Compiler.RegisterReference(this, this.Index);
+		}
+
 		public Value ReferencingValue
 		{
 			get
 			{
-				var toReturn = Compiler.GetValue( Index );
-				if ( toReturn is ExternalProperty ) toReturn = toReturn.Evaluate();
+				Value toReturn = Compiler.GetValue(Index);
+				if (toReturn is ExternalProperty) toReturn = toReturn.Evaluate();
 				return toReturn;
 			}
-			set { Compiler.SetValue( Index, value ); }
+			set { Compiler.SetValue(Index, value); }
 		}
 
-		public Reference ( Value ValueToReference )
-			: this( ValueToReference is Reference ? ( ValueToReference as Reference ).Index : Compiler.StoreValue( ValueToReference ) ) { }
-
-		public Reference ( Reference Reference )
-			: this( Reference.Index ) { }
-
-		public Reference ( int Index )
-		{
-			Static = Compiler.GetValue( Index ).Static;
-			this.Index = Index;
-			if ( this.Index != -1 ) //NullReference case
-				Compiler.RegisterReference( this, this.Index );
-		}
-		public void ChangeReference ( Reference Reference )
+		public void ChangeReference(Reference Reference)
 		{
 			Index = Reference.Index;
 		}
-		public void ChangeReference ( int Index )
+
+		public void ChangeReference(int Index)
 		{
 			Dereference();
 			this.Index = Index;
-			Compiler.RegisterReference( this, this.Index );
+			Compiler.RegisterReference(this, this.Index);
 		}
-		public override Value Clone ()
+
+		public override Value Clone()
 		{
-			return new Reference( ReferencingValue.Clone() );
+			return new Reference(ReferencingValue.Clone());
 		}
-		public HardReference GetHardReference ()
+
+		public HardReference GetHardReference()
 		{
-			return new HardReference( Index );
+			return new HardReference(Index);
 		}
-		public virtual void Dereference ()
+
+		public virtual void Dereference()
 		{
-			Compiler.Deference( this, Index );
+			Compiler.Deference(this, Index);
 			Index = -1;
 		}
-		public override bool Equals ( object Obj )
+
+		public override bool Equals(object Obj)
 		{
 			var reference = Obj as Reference;
-			if ( reference != null )
+			if (reference != null)
 			{
 				int myIndex = Index;
 				int referenceIndex = reference.Index;
@@ -61,25 +68,29 @@
 			}
 			return false;
 		}
-		public override int GetHashCode ()
+
+		public override int GetHashCode()
 		{
 			return Index;
 		}
-		public override string ToString ()
+
+		public override string ToString()
 		{
 			return ReferencingValue.ToString();
 		}
 	}
-	class NullReference : Reference
+
+	internal class NullReference : Reference
 	{
 		private static NullReference value = new NullReference();
+
+		public NullReference()
+			: base(-1) {}
+
 		public static NullReference Value
 		{
 			get { return value; }
 			set { NullReference.value = value; }
 		}
-
-		public NullReference ()
-			: base( -1 ) { }
 	}
 }

@@ -3,15 +3,10 @@ using System.Collections.Generic;
 
 namespace Kento
 {
-	class Function : CodeBlock, IFunction
+	internal class Function : CodeBlock, IFunction
 	{
-		List<String> args;
+		private readonly List<String> args;
 		private Scope scope;
-		public Scope Scope
-		{
-			get { return scope; }
-			set { scope = value; }
-		}
 
 		public Function ( Array Arguments, CodeBlock Code, Scope Scope )
 			: this( Arguments.ToArray<String>(), Code.Value, Scope ) { }
@@ -23,6 +18,15 @@ namespace Kento
 			args = Arguments;
 			Type = CodeBlockType.Function;
 		}
+
+		public Scope Scope
+		{
+			get { return scope; }
+			set { scope = value; }
+		}
+
+		#region IFunction Members
+
 		public virtual Value Invoke ( Array Args )
 		{
 			Compiler.SetAsCurrentScope( scope );
@@ -31,13 +35,25 @@ namespace Kento
 			{
 				Compiler.SetAlias( args[ i ].Val, Args.Arr[ i ] );
 			}
-			var result = Run();
+			Value result = Run();
 			Compiler.ExitScope( true );
 			return result;
 		}
+
+		#endregion
+
 		public override Value Clone ()
 		{
 			return new Function( args, Value, scope );
+		}
+
+		public Value Invoke ()
+		{
+			Compiler.SetAsCurrentScope( scope );
+			Compiler.EnterScope();
+			Value result = Run();
+			Compiler.ExitScope( true );
+			return result;
 		}
 	}
 }

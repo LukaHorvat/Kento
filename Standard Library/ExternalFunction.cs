@@ -1,19 +1,25 @@
 ﻿namespace Kento
 {
-	delegate Value ProcessInvoke ( Array Arguments );
+	internal delegate Value ProcessInvoke(Array Arguments);
 
-	class ExternalFunction : ExternalMember, IFunction
+	internal class ExternalFunction : ExternalMember, IFunction
 	{
-		ProcessInvoke function;
-		public ExternalFunction ( string Name, bool Static, ProcessInvoke Function )
+		private readonly ProcessInvoke function;
+
+		public ExternalFunction(string Name, bool Static, ProcessInvoke Function)
 		{
 			this.Static = Static;
 			Representation = Name;
 			function = Function;
 		}
-		public Value Invoke ( Array Arguments )
+
+		#region IFunction Members
+
+		public Value Invoke(Array Arguments)
 		{
-			return function( Arguments );
+			return function(Arguments);
 		}
+
+		#endregion
 	}
 }

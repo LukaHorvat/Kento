@@ -2,33 +2,39 @@
 
 namespace Kento
 {
-	class String : Literal
+	internal class String : Literal
 	{
 		private string value;
-		public string Val
-		{
-			get { return this.value; }
-			set { this.value = value; }
-		}
-		public override string ToString ()
-		{
-			return value;
-		}
-		public override Value Evaluate ()
-		{
-			return this;
-		}
-		public String ( string Value )
+
+		public String(string Value)
 		{
 			value = Value;
 		}
-		public override List<Token> Tokenize ()
+
+		public string Val
 		{
-			return new List<Token>( new Token[] { (Token)this } );
+			get { return value; }
+			set { this.value = value; }
 		}
-		public override Value Clone ()
+
+		public override string ToString()
 		{
-			return new String( value );
+			return value;
+		}
+
+		public override Value Evaluate()
+		{
+			return this;
+		}
+
+		public override List<Token> Tokenize()
+		{
+			return new List<Token>(new[]{(Token) this});
+		}
+
+		public override Value Clone()
+		{
+			return new String(value);
 		}
 	}
 }

@@ -1,40 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
 
-namespace FireflyGL {
+namespace FireflyGL
+{
+	internal class Attribute : IShaderObject
+	{
+		private int location;
 
-	class Attribute : IShaderObject {
-
-		private string identifier;
-		public string Identifier {
-			get { return identifier; }
-			set { identifier = value; }
+		public Attribute(string Identifier, int Location)
+		{
+			this.Identifier = Identifier;
+			location = Location;
 		}
 
-		private int location;
-		public int Location {
+		public string Identifier { get; set; }
+
+		#region IShaderObject Members
+
+		public int Location
+		{
 			get { return location; }
 			set { location = value; }
 		}
 
-		public Attribute ( string Identifier, int Location ) {
+		#endregion
 
-			identifier = Identifier;
-			location = Location;
+		public void AttributePointerFloat(int Size, int Stride, int Offset)
+		{
+			GL.VertexAttribPointer(location, Size, VertexAttribPointerType.Float, false, Stride*sizeof (float),
+			                       Offset*sizeof (float));
 		}
 
-		public void AttributePointerFloat ( int Size, int Stride, int Offset ) {
-
-			GL.VertexAttribPointer( location, Size, VertexAttribPointerType.Float, false, Stride * sizeof( float ), Offset * sizeof( float ) );
-		}
-
-		public void AttributePointerInt ( int Size, int Stride, int Offset ) {
-
-			GL.VertexAttribPointer( location, Size, VertexAttribPointerType.Int, false, Stride * sizeof( int ), Offset * sizeof( int ) );
+		public void AttributePointerInt(int Size, int Stride, int Offset)
+		{
+			GL.VertexAttribPointer(location, Size, VertexAttribPointerType.Int, false, Stride*sizeof (int), Offset*sizeof (int));
 		}
 	}
 }

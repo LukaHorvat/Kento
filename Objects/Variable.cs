@@ -2,18 +2,18 @@
 
 namespace Kento
 {
-	abstract class Variable : Value
+	internal abstract class Variable : Value {}
+
+	internal class ConditionNotMet : Variable
 	{
-	}
-	class ConditionNotMet : Variable
-	{
-		public override Value Evaluate ()
+		public override Value Evaluate()
 		{
 			return NoValue.Value;
 		}
-		public override List<Token> Tokenize ()
+
+		public override List<Token> Tokenize()
 		{
-			return new List<Token>( new Token[] { (Token)this } );
+			return new List<Token>(new[]{(Token) this});
 		}
 	}
 }

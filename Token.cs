@@ -1,7 +1,4 @@
 ﻿namespace Kento
 {
-	public abstract class Token
-	{
-
-	}
+	public abstract class Token {}
 }

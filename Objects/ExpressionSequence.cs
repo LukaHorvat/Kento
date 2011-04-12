@@ -2,19 +2,21 @@
 
 namespace Kento
 {
-	class ExpressionSequence : Value
+	internal class ExpressionSequence : Value
 	{
-		TokenList list;
-		public ExpressionSequence ( TokenList List )
+		private readonly TokenList list;
+
+		public ExpressionSequence(TokenList List)
 		{
 			list = List;
 		}
-		public override List<Token> Tokenize ()
+
+		public override List<Token> Tokenize()
 		{
 			var returnList = new List<Token>();
-			for ( var node = list.First; node != null ; node = node.Next )
+			for (TokenListNode node = list.First; node != null; node = node.Next)
 			{
-				returnList.AddRange( ( (Value) node.Value ).Tokenize() );
+				returnList.AddRange(((Value) node.Value).Tokenize());
 			}
 			return returnList;
 		}

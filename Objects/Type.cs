@@ -2,39 +2,48 @@
 
 namespace Kento
 {
-	class Type : CodeBlock, IClass
+	internal class Type : CodeBlock, IClass
 	{
-		public Scope Identifiers { get; set; }
-		public InstanceFlags Flags { get; set; }
+		public Type(Type BaseClass, CodeBlock Code)
+			: this(BaseClass, Code.Value) {}
 
-		public Type ( Type BaseClass, CodeBlock Code )
-			: this( BaseClass, Code.Value ) { }
-		public Type ( Type BaseClass, List<Token> Code )
-			: base( Code )
+		public Type(Type BaseClass, List<Token> Code)
+			: base(Code)
 		{
 			Identifiers = BaseClass.Identifiers.Clone();
 			Type = CodeBlockType.Type;
 		}
-		public Type ( CodeBlock Code )
-			: base( Code.Value )
+
+		public Type(CodeBlock Code)
+			: base(Code.Value)
 		{
 			Identifiers = new Scope();
 			Type = CodeBlockType.Type;
 		}
-		public override Value Run ()
+
+		#region IClass Members
+
+		public Scope Identifiers { get; set; }
+		public InstanceFlags Flags { get; set; }
+
+		public Instance MakeInstance()
 		{
-			Compiler.SetAsCurrentScope( Identifiers );
+			return new Instance(this);
+		}
+
+		#endregion
+
+		public override Value Run()
+		{
+			Compiler.SetAsCurrentScope(Identifiers);
 			base.Run();
-			Compiler.ExitScope( true );
+			Compiler.ExitScope(true);
 			return this;
 		}
-		public override Value Clone ()
+
+		public override Value Clone()
 		{
-			return new Type( this, Value );
-		}
-		public Instance MakeInstance ()
-		{
-			return new Instance( this );
+			return new Type(this, Value);
 		}
 	}
 }

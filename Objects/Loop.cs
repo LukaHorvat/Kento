@@ -3,23 +3,26 @@ using System.Linq;
 
 namespace Kento
 {
-	class Loop : CodeBlock
+	internal class Loop : CodeBlock
 	{
-		CodeBlock condition;
-		public Loop ( CodeBlock Condition, CodeBlock Block )
-			: base( Block.Value )
+		private readonly CodeBlock condition;
+
+		public Loop(CodeBlock Condition, CodeBlock Block)
+			: base(Block.Value)
 		{
 			condition = Condition;
 			Type = CodeBlockType.Loop;
 		}
-		public override List<Token> Tokenize ()
+
+		public override List<Token> Tokenize()
 		{
-			return new Token[] { this, new RunCodeBlock() }.ToList();
+			return new Token[]{this, new RunCodeBlock()}.ToList();
 		}
-		public override Value Run ()
+
+		public override Value Run()
 		{
 			Compiler.EnterScope();
-			while ( ( (Boolean)condition.Run() ).Val )
+			while (((Boolean) condition.Run()).Val)
 			{
 				base.Run();
 			}

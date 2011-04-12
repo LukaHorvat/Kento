@@ -1,6 +1,6 @@
 ﻿namespace Kento
 {
-	enum OperatorType
+	internal enum OperatorType
 	{
 		PrefixUnary = 0,
 		SufixUnary,

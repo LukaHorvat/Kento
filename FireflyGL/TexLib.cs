@@ -1,9 +1,9 @@
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using OpenTK;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
+using OpenTK.Graphics.OpenGL;
 using Img = System.Drawing.Imaging;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 
 /* Example code:
@@ -22,12 +22,14 @@ using Img = System.Drawing.Imaging;
 
 */
 
-namespace TexLib {
+namespace TexLib
+{
 	/// <summary>
 	/// The TexUtil class is released under the MIT-license.
 	/// /Olof Bjarnason
 	/// </summary>
-	public static class TexUtil {
+	public static class TexUtil
+	{
 		#region Public
 
 		/// <summary>
@@ -37,12 +39,13 @@ namespace TexLib {
 		/// application, eg. in OnLoad() of GameWindow or Form_Load()
 		/// if you're building a WinForm app.
 		/// </summary>
-		public static void InitTexturing () {
-			GL.Disable( EnableCap.CullFace );
-			GL.Enable( EnableCap.Texture2D );
-			GL.Enable( EnableCap.Blend );
-			GL.BlendFunc( BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha );
-			GL.PixelStore( PixelStoreParameter.UnpackAlignment, 1 );
+		public static void InitTexturing()
+		{
+			GL.Disable(EnableCap.CullFace);
+			GL.Enable(EnableCap.Texture2D);
+			GL.Enable(EnableCap.Blend);
+			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+			GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 		}
 
 		/// <summary>
@@ -52,39 +55,42 @@ namespace TexLib {
 		/// to call GL.DeleteTexture(int) when you don't need the texture anymore (eg. when switching
 		/// levels in your game).
 		/// </summary>
-		public static int CreateRGBTexture ( int width, int height, byte[] rgb ) {
-			return CreateTexture( width, height, false, rgb );
+		public static int CreateRGBTexture(int width, int height, byte[] rgb)
+		{
+			return CreateTexture(width, height, false, rgb);
 		}
 
 		/// <summary>
 		/// Create a translucent OpenGL texture object from given byte-array of r,g,b,a-triplets.
 		/// See CreateRGBTexture for more info.
 		/// </summary>
-		public static int CreateRGBATexture ( int width, int height, byte[] rgba ) {
-			return CreateTexture( width, height, true, rgba );
+		public static int CreateRGBATexture(int width, int height, byte[] rgba)
+		{
+			return CreateTexture(width, height, true, rgba);
 		}
 
 		/// <summary>
 		/// Create an OpenGL texture (translucent or opaque) from a given Bitmap.
 		/// 24- and 32-bit bitmaps supported.
 		/// </summary>
-		public static int CreateTextureFromBitmap ( Bitmap bitmap ) {
-			Img.BitmapData data = bitmap.LockBits(
-			  new Rectangle( 0, 0, bitmap.Width, bitmap.Height ),
-			  Img.ImageLockMode.ReadOnly,
-			  Img.PixelFormat.Format32bppArgb );
-			var tex = GiveMeATexture();
-			GL.BindTexture( TextureTarget.Texture2D, tex );
+		public static int CreateTextureFromBitmap(Bitmap bitmap)
+		{
+			BitmapData data = bitmap.LockBits(
+				new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+				ImageLockMode.ReadOnly,
+				PixelFormat.Format32bppArgb);
+			int tex = GiveMeATexture();
+			GL.BindTexture(TextureTarget.Texture2D, tex);
 			GL.TexImage2D(
-			  TextureTarget.Texture2D,
-			  0,
-			  PixelInternalFormat.Rgba,
-			  data.Width, data.Height,
-			  0,
-			  PixelFormat.Bgra,
-			  PixelType.UnsignedByte,
-			  data.Scan0 );
-			bitmap.UnlockBits( data );
+				TextureTarget.Texture2D,
+				0,
+				PixelInternalFormat.Rgba,
+				data.Width, data.Height,
+				0,
+				OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
+				PixelType.UnsignedByte,
+				data.Scan0);
+			bitmap.UnlockBits(data);
 			SetParameters();
 			return tex;
 		}
@@ -93,62 +99,94 @@ namespace TexLib {
 		/// Create an OpenGL texture (translucent or opaque) by loading a bitmap
 		/// from file. 24- and 32-bit bitmaps supported.
 		/// </summary>
-		public static int CreateTextureFromFile ( string path ) {
-			return CreateTextureFromBitmap( new Bitmap( Bitmap.FromFile( path ) ) );
+		public static int CreateTextureFromFile(string path)
+		{
+			return CreateTextureFromBitmap(new Bitmap(Image.FromFile(path)));
 		}
 
 		#endregion
 
-		private static int CreateTexture ( int width, int height, bool alpha, byte[] bytes ) {
-			int expectedBytes = width * height * ( alpha ? 4 : 3 );
-			Debug.Assert( expectedBytes == bytes.Length );
+		private static int CreateTexture(int width, int height, bool alpha, byte[] bytes)
+		{
+			int expectedBytes = width*height*(alpha ? 4 : 3);
+			Debug.Assert(expectedBytes == bytes.Length);
 			int tex = GiveMeATexture();
-			Upload( width, height, alpha, bytes );
+			Upload(width, height, alpha, bytes);
 			SetParameters();
 			return tex;
 		}
 
-		private static int GiveMeATexture () {
+		private static int GiveMeATexture()
+		{
 			int tex = GL.GenTexture();
-			GL.BindTexture( TextureTarget.Texture2D, tex );
+			GL.BindTexture(TextureTarget.Texture2D, tex);
 			return tex;
 		}
 
-		private static void SetParameters () {
+		private static void SetParameters()
+		{
 			GL.TexParameter(
-			  TextureTarget.Texture2D,
-			  TextureParameterName.TextureMinFilter,
-			  (int)TextureMinFilter.Linear );
+				TextureTarget.Texture2D,
+				TextureParameterName.TextureMinFilter,
+				(int) TextureMinFilter.Linear);
 
-			GL.TexParameter( TextureTarget.Texture2D,
-			  TextureParameterName.TextureMagFilter,
-			  (int)TextureMagFilter.Linear );
+			GL.TexParameter(TextureTarget.Texture2D,
+			                TextureParameterName.TextureMagFilter,
+			                (int) TextureMagFilter.Linear);
 
-			GL.TexParameter( TextureTarget.Texture2D, 
-				TextureParameterName.TextureWrapS, 
-				(float)TextureWrapMode.ClampToEdge );
+			GL.TexParameter(TextureTarget.Texture2D,
+			                TextureParameterName.TextureWrapS,
+			                (float) TextureWrapMode.ClampToEdge);
 
-			GL.TexParameter( TextureTarget.Texture2D, 
-				TextureParameterName.TextureWrapT,
-				(float)TextureWrapMode.ClampToEdge );
+			GL.TexParameter(TextureTarget.Texture2D,
+			                TextureParameterName.TextureWrapT,
+			                (float) TextureWrapMode.ClampToEdge);
 		}
 
-		private static void Upload ( int width, int height, bool alpha, byte[] bytes ) {
-			var internalFormat = alpha ? PixelInternalFormat.Rgba : PixelInternalFormat.Rgb;
-			var format = alpha ? PixelFormat.Rgba : PixelFormat.Rgb;
-			GL.TexImage2D<byte>(
-			  TextureTarget.Texture2D,
-			  0,
-			  internalFormat,
-			  width, height,
-			  0,
-			  format,
-			  PixelType.UnsignedByte,
-			  bytes );
+		private static void Upload(int width, int height, bool alpha, byte[] bytes)
+		{
+			PixelInternalFormat internalFormat = alpha ? PixelInternalFormat.Rgba : PixelInternalFormat.Rgb;
+			OpenTK.Graphics.OpenGL.PixelFormat format = alpha
+			                                            	? OpenTK.Graphics.OpenGL.PixelFormat.Rgba
+			                                            	: OpenTK.Graphics.OpenGL.PixelFormat.Rgb;
+			GL.TexImage2D(
+				TextureTarget.Texture2D,
+				0,
+				internalFormat,
+				width, height,
+				0,
+				format,
+				PixelType.UnsignedByte,
+				bytes);
 		}
 	}
 
-	public class TextureFont {
+	public class TextureFont
+	{
+		private const double Sixteenth = 1.0/16.0;
+		private readonly int textureId;
+
+		/// <summary>
+		/// Determines the distance from character center to adjacent character center, horizontally, in
+		/// one written text string. Model space coordinates.
+		/// </summary>
+		public double AdvanceWidth = 0.75;
+
+		/// <summary>
+		/// Determines the height of the cut-out to do for each character when rendering. This is necessary
+		/// to avoid artefacts stemming from filtering (zooming/rotating). Make sure your font contains some
+		/// "white space" around each character so they won't be clipped due to this!
+		/// </summary>
+		public double CharacterBoundingBoxHeight = 0.8;
+		              //{ get { return 1.0 - borderY * 2; } set { borderY = (1.0 - value) / 2.0; } }
+
+		/// <summary>
+		/// Determines the width of the cut-out to do for each character when rendering. This is necessary
+		/// to avoid artefacts stemming from filtering (zooming/rotating). Make sure your font contains some
+		/// "white space" around each character so they won't be clipped due to this!
+		/// </summary>
+		public double CharacterBoundingBoxWidth = 0.8;
+
 		/// <summary>
 		/// Create a TextureFont object. The sent-in textureId should refer to a
 		/// texture bitmap containing a 16x16 grid of fixed-width characters,
@@ -157,7 +195,8 @@ namespace TexLib {
 		/// texture bitmap may be anything from 128x128 to 512x256 or any other
 		/// order-by-two-squared-dimensions.
 		/// </summary>
-		public TextureFont ( int textureId ) {
+		public TextureFont(int textureId)
+		{
 			this.textureId = textureId;
 		}
 
@@ -168,15 +207,17 @@ namespace TexLib {
 		/// This call modifies the currently bound
 		/// 2D-texture, but no other GL state.
 		/// </summary>
-		public void WriteString ( string text ) {
-			GL.BindTexture( TextureTarget.Texture2D, textureId );
+		public void WriteString(string text)
+		{
+			GL.BindTexture(TextureTarget.Texture2D, textureId);
 			GL.PushMatrix();
-			double width = ComputeWidth( text );
-			GL.Translate( -width / 2.0, -0.5, 0 );
-			GL.Begin( BeginMode.Quads );
+			double width = ComputeWidth(text);
+			GL.Translate(-width/2.0, -0.5, 0);
+			GL.Begin(BeginMode.Quads);
 			double xpos = 0;
-			foreach ( var ch in text ) {
-				WriteCharacter( ch, xpos );
+			foreach (char ch in text)
+			{
+				WriteCharacter(ch, xpos);
 				xpos += AdvanceWidth;
 			}
 			GL.End();
@@ -184,31 +225,12 @@ namespace TexLib {
 		}
 
 		/// <summary>
-		/// Determines the distance from character center to adjacent character center, horizontally, in
-		/// one written text string. Model space coordinates.
-		/// </summary>
-		public double AdvanceWidth = 0.75;
-
-		/// <summary>
-		/// Determines the width of the cut-out to do for each character when rendering. This is necessary
-		/// to avoid artefacts stemming from filtering (zooming/rotating). Make sure your font contains some
-		/// "white space" around each character so they won't be clipped due to this!
-		/// </summary>
-		public double CharacterBoundingBoxWidth = 0.8;
-
-		/// <summary>
-		/// Determines the height of the cut-out to do for each character when rendering. This is necessary
-		/// to avoid artefacts stemming from filtering (zooming/rotating). Make sure your font contains some
-		/// "white space" around each character so they won't be clipped due to this!
-		/// </summary>
-		public double CharacterBoundingBoxHeight = 0.8;//{ get { return 1.0 - borderY * 2; } set { borderY = (1.0 - value) / 2.0; } }
-
-		/// <summary>
 		/// Computes the expected width of text string given. The height is always 1.0.
 		/// Model space coordinates.
 		/// </summary>
-		public double ComputeWidth ( string text ) {
-			return text.Length * AdvanceWidth;
+		public double ComputeWidth(string text)
+		{
+			return text.Length*AdvanceWidth;
 		}
 
 		/// <summary>
@@ -217,63 +239,69 @@ namespace TexLib {
 		/// No GL state except the currently bound texture is modified. This method is not as flexible nor as fast
 		/// as the WriteString() method, but it is easier to use.
 		/// </summary>
-		public void WriteStringAt (
-		  string text,
-		  double heightPercent,
-		  double xPercent,
-		  double yPercent,
-		  double degreesCounterClockwise ) {
-			GL.MatrixMode( MatrixMode.Projection );
+		public void WriteStringAt(
+			string text,
+			double heightPercent,
+			double xPercent,
+			double yPercent,
+			double degreesCounterClockwise)
+		{
+			GL.MatrixMode(MatrixMode.Projection);
 			GL.PushMatrix();
 			GL.LoadIdentity();
-			GL.Ortho( 0, 100, 0, 100, -1, 1 );
-			GL.MatrixMode( MatrixMode.Modelview );
+			GL.Ortho(0, 100, 0, 100, -1, 1);
+			GL.MatrixMode(MatrixMode.Modelview);
 			GL.PushMatrix();
 			GL.LoadIdentity();
-			GL.Translate( xPercent, yPercent, 0 );
+			GL.Translate(xPercent, yPercent, 0);
 			double aspectRatio = ComputeAspectRatio();
-			GL.Scale( aspectRatio * heightPercent, heightPercent, heightPercent );
-			GL.Rotate( degreesCounterClockwise, 0, 0, 1 );
-			WriteString( text );
+			GL.Scale(aspectRatio*heightPercent, heightPercent, heightPercent);
+			GL.Rotate(degreesCounterClockwise, 0, 0, 1);
+			WriteString(text);
 			GL.PopMatrix();
-			GL.MatrixMode( MatrixMode.Projection );
+			GL.MatrixMode(MatrixMode.Projection);
 			GL.PopMatrix();
-			GL.MatrixMode( MatrixMode.Modelview );
+			GL.MatrixMode(MatrixMode.Modelview);
 		}
 
-		private static double ComputeAspectRatio () {
-			int[] viewport = new int[ 4 ];
-			GL.GetInteger( GetPName.Viewport, viewport );
-			int w = viewport[ 2 ];
-			int h = viewport[ 3 ];
-			double aspectRatio = (float)h / (float)w;
+		private static double ComputeAspectRatio()
+		{
+			var viewport = new int[4];
+			GL.GetInteger(GetPName.Viewport, viewport);
+			int w = viewport[2];
+			int h = viewport[3];
+			double aspectRatio = h/(float) w;
 			return aspectRatio;
 		}
 
-		private void WriteCharacter ( char ch, double xpos ) {
+		private void WriteCharacter(char ch, double xpos)
+		{
 			byte ascii;
-			unchecked { ascii = (byte)ch; }
+			unchecked
+			{
+				ascii = (byte) ch;
+			}
 
 			int row = ascii >> 4;
 			int col = ascii & 0x0F;
 
-			double centerx = ( col + 0.5 ) * Sixteenth;
-			double centery = ( row + 0.5 ) * Sixteenth;
-			double halfHeight = CharacterBoundingBoxHeight * Sixteenth / 2.0;
-			double halfWidth = CharacterBoundingBoxWidth * Sixteenth / 2.0;
+			double centerx = (col + 0.5)*Sixteenth;
+			double centery = (row + 0.5)*Sixteenth;
+			double halfHeight = CharacterBoundingBoxHeight*Sixteenth/2.0;
+			double halfWidth = CharacterBoundingBoxWidth*Sixteenth/2.0;
 			double left = centerx - halfWidth;
 			double right = centerx + halfWidth;
 			double top = centery - halfHeight;
 			double bottom = centery + halfHeight;
 
-			GL.TexCoord2( left, top ); GL.Vertex2( xpos, 1 );
-			GL.TexCoord2( right, top ); GL.Vertex2( xpos + 1, 1 );
-			GL.TexCoord2( right, bottom ); GL.Vertex2( xpos + 1, 0 );
-			GL.TexCoord2( left, bottom ); GL.Vertex2( xpos, 0 );
+			GL.TexCoord2(left, top);
+			GL.Vertex2(xpos, 1);
+			GL.TexCoord2(right, top);
+			GL.Vertex2(xpos + 1, 1);
+			GL.TexCoord2(right, bottom);
+			GL.Vertex2(xpos + 1, 0);
+			GL.TexCoord2(left, bottom);
+			GL.Vertex2(xpos, 0);
 		}
-
-		private int textureId;
-		private const double Sixteenth = 1.0 / 16.0;
 	}
-
 }

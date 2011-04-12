@@ -37,14 +37,41 @@
     <ApplicationIcon>kicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\OpenTK\1.0\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FireflyGL\Camera.cs" />
+    <Compile Include="FireflyGL\Display Objects\ColoredShape.cs" />
+    <Compile Include="FireflyGL\Display Objects\DisplayObject.cs" />
+    <Compile Include="FireflyGL\Display Objects\Shape.cs" />
+    <Compile Include="FireflyGL\Display Objects\TexturedShape.cs" />
+    <Compile Include="FireflyGL\Firefly.cs" />
+    <Compile Include="FireflyGL\Geometry\Polygon.cs" />
+    <Compile Include="FireflyGL\Input.cs" />
+    <Compile Include="FireflyGL\Interfaces\IRenderable.cs" />
+    <Compile Include="FireflyGL\Interfaces\IShaderObject.cs" />
+    <Compile Include="FireflyGL\Interfaces\IUpdatable.cs" />
+    <Compile Include="FireflyGL\OGL Objects\Attribute.cs" />
+    <Compile Include="FireflyGL\OGL Objects\Buffer.cs" />
+    <Compile Include="FireflyGL\OGL Objects\FragmentShader.cs" />
+    <Compile Include="FireflyGL\OGL Objects\Shader.cs" />
+    <Compile Include="FireflyGL\OGL Objects\ShaderProgram.cs" />
+    <Compile Include="FireflyGL\OGL Objects\Texture.cs" />
+    <Compile Include="FireflyGL\OGL Objects\Uniform.cs" />
+    <Compile Include="FireflyGL\OGL Objects\VertexShader.cs" />
+    <Compile Include="FireflyGL\TexLib.cs" />
+    <Compile Include="FireflyGL\Utility.cs" />
+    <Compile Include="FireflyGL\Window.cs" />
     <Compile Include="Interfaces\IClass.cs" />
     <Compile Include="Interfaces\IHasMembers.cs" />
     <Compile Include="Interfaces\IFunction.cs" />
@@ -73,6 +100,9 @@
     <Compile Include="Objects\String.cs" />
     <Compile Include="Scope.cs" />
     <Compile Include="Standard Library\Array\SLArray.cs" />
+    <Compile Include="Standard Library\Firefly\SLColor.cs" />
+    <Compile Include="Standard Library\Firefly\SLFirefly.cs" />
+    <Compile Include="Standard Library\Firefly\SLWindow.cs" />
     <Compile Include="Standard Library\Math\SLMath.cs" />
     <Compile Include="Standard Library\System\SLConsole.cs" />
     <Compile Include="Standard Library\ExternalBinding.cs" />

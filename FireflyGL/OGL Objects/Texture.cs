@@ -1,87 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 using OpenTK.Graphics.OpenGL;
 using TexLib;
 
-namespace FireflyGL {
+namespace FireflyGL
+{
+	internal class Texture
+	{
+		public float height;
+		public float width;
 
-	class Texture {
+		public Texture(Bitmap Bmp)
+		{
+			Width = Bmp.Width;
+			Height = Bmp.Height;
 
-		private int id;
-		public int Id {
-			get { return id; }
-			set { id = value; }
+			Id = TexUtil.CreateTextureFromBitmap(Bmp);
+			Animated = false;
 		}
 
-		public float width, height;
-		public float Height {
+		public Texture(string Path)
+		{
+			var Bmp = new Bitmap(Path);
+			Width = Bmp.Width;
+			Height = Bmp.Height;
+
+			Id = TexUtil.CreateTextureFromBitmap(Bmp);
+			Animated = false;
+		}
+
+		public Texture(Bitmap Bmp, int Frames)
+		{
+			Width = Bmp.Width/Frames;
+			Height = Bmp.Height;
+
+			Id = TexUtil.CreateTextureFromBitmap(Bmp);
+			this.Frames = Frames;
+			Animated = true;
+		}
+
+		public Texture(string Path, int Frames)
+		{
+			var Bmp = new Bitmap(Path);
+			Width = Bmp.Width/Frames;
+			Height = Bmp.Height;
+
+			Id = TexUtil.CreateTextureFromBitmap(Bmp);
+			this.Frames = Frames;
+			Animated = true;
+		}
+
+		public int Id { get; set; }
+
+		public float Height
+		{
 			get { return height; }
 			set { height = value; }
 		}
-		public float Width {
+
+		public float Width
+		{
 			get { return width; }
 			set { width = value; }
 		}
 
-		private int frames;
-		public int Frames {
-			get { return frames; }
-			set { frames = value; }
-		}
+		public int Frames { get; set; }
 
-		private bool animated;
-		public bool Animated {
-			get { return animated; }
-			set { animated = value; }
-		}
+		public bool Animated { get; set; }
 
-		public Texture ( Bitmap Bmp ) {
-
-			this.Width = Bmp.Width;
-			this.Height = Bmp.Height;
-
-			this.Id = TexUtil.CreateTextureFromBitmap( Bmp );
-			Animated = false;
-		}
-
-		public Texture ( string Path ) {
-
-			Bitmap Bmp = new Bitmap( Path );
-			this.Width = Bmp.Width;
-			this.Height = Bmp.Height;
-
-			this.Id = TexUtil.CreateTextureFromBitmap( Bmp );
-			Animated = false;
-		}
-
-		public Texture ( Bitmap Bmp, int Frames ) {
-
-			this.Width = Bmp.Width / Frames;
-			this.Height = Bmp.Height;
-
-			this.Id = TexUtil.CreateTextureFromBitmap( Bmp );
-			this.Frames = Frames;
-			Animated = true;
-		}
-
-		public Texture ( string Path, int Frames ) {
-
-			Bitmap Bmp = new Bitmap( Path );
-			this.Width = Bmp.Width / Frames;
-			this.Height = Bmp.Height;
-
-			this.Id = TexUtil.CreateTextureFromBitmap( Bmp );
-			this.Frames = Frames;
-			Animated = true;
-		}
-
-		public void Bind () {
-
-			GL.ActiveTexture( TextureUnit.Texture0 );
-			GL.BindTexture( TextureTarget.Texture2D, Id );
+		public void Bind()
+		{
+			GL.ActiveTexture(TextureUnit.Texture0);
+			GL.BindTexture(TextureTarget.Texture2D, Id);
 		}
 	}
 }

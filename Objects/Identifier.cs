@@ -1,38 +1,33 @@
-﻿using System;
-
-namespace Kento
+﻿namespace Kento
 {
-	class Identifier : Variable
+	internal class Identifier : Variable
 	{
-		string name;
-		public string Name
+		public Identifier(string Name)
 		{
-			get { return name; }
-			set { name = value; }
+			this.Name = Name;
 		}
 
-		public Identifier ( string Name )
-		{
-			name = Name;
-		}
-		public override string ToString ()
+		public string Name { get; set; }
+
+		public override string ToString()
 		{
 			return Name;
 		}
-		public override Value Evaluate ()
+
+		public override Value Evaluate()
 		{
-			if ( Compiler.Runtime )
+			if (Compiler.Runtime)
 			{
-				var reference = Compiler.Identify( Name );
-				if ( reference == NullReference.Value )
+				Reference reference = Compiler.Identify(Name);
+				if (reference == NullReference.Value)
 				{
 					reference = Compiler.Reserve();
-					Compiler.SetAlias( Name, reference );
+					Compiler.SetAlias(Name, reference);
 				}
-				if ( Compiler.PendingDot )
+				if (Compiler.PendingDot)
 				{
 					Compiler.PendingDot = false;
-					Compiler.ExitScope( true );
+					Compiler.ExitScope(true);
 				}
 				return reference;
 			}
