@@ -29,6 +29,8 @@ namespace Kento
 			Identifiers[ "Remove" ] = new Reference( new ExternalFunction( "Remove", false, Remove ) );
 			Identifiers[ "RemoveAt" ] = new Reference( new ExternalFunction( "RemoveAt", false, RemoveAt ) );
 			Identifiers[ "Insert" ] = new Reference( new ExternalFunction( "Insert", false, Insert ) );
+			Identifiers[ "Max" ] = new Reference( new ExternalFunction( "Max", false, Max ) );
+			Identifiers[ "Min" ] = new Reference( new ExternalFunction( "Min", false, Min ) );
 		}
 		#region Members
 		public Value Count ()
@@ -89,6 +91,22 @@ namespace Kento
 				Arr.Insert( index, second );
 			} else throw new Exception( "Index is out of bounds" );
 			return this;
+		}
+		public Value Max ( Array Arguments )
+		{
+			if ( Arguments.Arr.All( X => X.ReferencingValue is Number ) )
+			{
+				return Arguments.Arr.Max();
+			}
+			throw new Exception( "Max function can only be used on arrays containing only numbers" );
+		}
+		public Value Min ( Array Arguments )
+		{
+			if ( Arguments.Arr.All( X => X.ReferencingValue is Number ) )
+			{
+				return Arguments.Arr.Min();
+			}
+			throw new Exception( "Min function can only be used on arrays containing only numbers" );
 		}
 		#endregion
 		public override Array ToArray ()

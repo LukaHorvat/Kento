@@ -4,19 +4,21 @@ namespace Kento
 {
 	class SLMath : ILibrarySegment
 	{
-		static Number pi = new Number( Math.PI );
+		static readonly Number pi = new Number( Math.PI );
 
 		public ExternalClass Load ()
 		{
-			var pi = new ExternalProperty( "PI", true, Pi );
+			var piConst = new ExternalProperty( "PI", true, Pi );
 			var sin = new ExternalFunction( "Sin", true, Sin );
 			var cos = new ExternalFunction( "Cos", true, Cos );
 			var tan = new ExternalFunction( "Tan", true, Tan );
 			var asin = new ExternalFunction( "Asin", true, Asin );
 			var acos = new ExternalFunction( "Acos", true, Acos );
 			var atan = new ExternalFunction( "Atan", true, Atan );
+			var floor = new ExternalFunction( "Floor", true, Floor );
+			var ceil = new ExternalFunction( "Ceiling", true, Ceiling );
 
-			return new ExternalClass( "Math", InstanceFlags.NoFlags, pi, sin, cos, tan, asin, acos, atan );
+			return new ExternalClass( "Math", InstanceFlags.NoFlags, piConst, sin, cos, tan, asin, acos, atan, floor, ceil );
 		}
 
 		public Value Pi ()
@@ -58,6 +60,18 @@ namespace Kento
 			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
 				return new Number( Math.Atan( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
 			throw new Exception( "Atan function takes only a number" );
+		}
+		public Value Floor ( Array Arguments )
+		{
+			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
+				return new Number( Math.Floor( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			throw new Exception( "Floor function takes only a number" );
+		}
+		public Value Ceiling ( Array Arguments )
+		{
+			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
+				return new Number( Math.Ceiling( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			throw new Exception( "Ceiling function takes only a number" );
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Kento
 {
@@ -7,7 +8,7 @@ namespace Kento
 		private double value;
 		public double Val
 		{
-			get { return this.value; }
+			get { return value; }
 			set { this.value = value; }
 		}
 
@@ -15,21 +16,18 @@ namespace Kento
 		{
 			return value.ToString();
 		}
-		public override Value Evaluate ()
-		{
-			return this;
-		}
 		public Number ( double Value )
 		{
 			value = Value;
 		}
-		public override List<Token> Tokenize ()
-		{
-			return new List<Token>( new Token[] { (Token)this } );
-		}
 		public override Value Clone ()
 		{
 			return new Number( value );
+		}
+		public override int CompareTo ( Value Other )
+		{
+			if ( Other is Number ) return (int)Math.Ceiling( value - ( Other as Number ).value );
+			return 1;
 		}
 	}
 }

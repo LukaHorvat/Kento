@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Kento
 {
-	public abstract class Value : Token
+	public abstract class Value : Token, IComparable<Value>
 	{
 		public virtual Value Evaluate ()
 		{
@@ -21,6 +22,11 @@ namespace Kento
 			return this;
 		}
 		public virtual bool Static { get; set; }
+
+		public virtual int CompareTo ( Value Other )
+		{
+			return -1;
+		}
 	}
 	class NoValue : Value
 	{
