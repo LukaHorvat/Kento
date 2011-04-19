@@ -9,31 +9,36 @@ namespace Kento
 
 		#region IComparable<Value> Members
 
-		public virtual int CompareTo(Value Other)
+		public virtual int CompareTo ( Value Other )
 		{
 			return -1;
 		}
 
 		#endregion
 
-		public virtual Value Evaluate()
+		public virtual Value Evaluate ()
 		{
 			return this;
 		}
 
-		public virtual Array ToArray()
+		public virtual Array ToArray ()
 		{
-			return new Array(new Reference(this));
+			return new Array( this );
 		}
 
-		public virtual List<Token> Tokenize()
+		public virtual List<Token> Tokenize ()
 		{
-			return new List<Token>(new[]{(Token) this});
+			return new List<Token>( new[] { (Token)this } );
 		}
 
-		public virtual Value Clone()
+		public virtual Value Clone ()
 		{
 			return this;
+		}
+
+		public virtual void Destroy ()
+		{
+
 		}
 	}
 

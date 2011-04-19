@@ -1,8 +1,8 @@
 Arr = new Array(100)
 i = 0
 while (i < 100) {
-	Arr[i] = System.GetTime()
-	++i
+	Arr[i] = System.Time
+	i++
 }
 declare temp
 i = 0
@@ -14,8 +14,8 @@ while (i < 100) {
 			Arr[j] = Arr[i] - Arr[j]
 			Arr[i] -= Arr[j]
 		}
-		++j
+		j++
 	}
-	++i
+	i++
 }
-Console.Output( System.GetTime() )
+Console.Output( System.Time )

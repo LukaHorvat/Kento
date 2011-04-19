@@ -1,40 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FireflyGL;
+﻿using FireflyGL;
 
 namespace Kento
 {
 	class SLFirefly : ILibrarySegment
 	{
-		Reference color;
 		public ExternalClass Load ()
 		{
 			return new ExternalClass( "Firefly", InstanceFlags.NoFlags
 				, new ExternalFunction( "Initialize", true, Initialize )
-				, new ExternalProperty( "BackgroundColor", true, BackgroundColor )
-				, new ExternalFunction( "SetBackgroundColor", true, SetBackgroundColor ) );
+				, new ExternalProperty( "FrameTime", true, () => new Number( Firefly.TotalTime ) )
+				, new ExternalProperty( "BackgroundColor", true, SetBackgroundColor, new SLColor( 0, 0, 0 ) ) );
 		}
 		public Value Initialize ( Array Arguments )
 		{
-			color = new Reference( new SLColor() );
 			return new SLWindow().Invoke( Arguments );
 		}
-		public Value BackgroundColor ()
+		public void SetBackgroundColor ( Value NewValue )
 		{
-			return color;
-		}
-		public Value SetBackgroundColor ( Array Arguments )
-		{
-			var aColor = Arguments.GetReferenceAtIndex( 0 ).ReferencingValue;
-			if ( aColor is SLColor )
+			if ( NewValue is SLColor )
 			{
-				color.ReferencingValue = aColor;
-				Firefly.Window.ClearColor = ( aColor as SLColor ).GetColor();
-				return NoValue.Value;
+				Firefly.Window.ClearColor = ( NewValue as SLColor ).GetColor();
 			}
-			throw new Exception( "SetBackgroundColor needs a color" );
 		}
 	}
 }

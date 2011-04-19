@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 namespace FireflyGL
 {
-	public delegate void OnLoadHandler(object Target, EventArgs Arguments);
+	public delegate void OnLoadHandler ( object Target, EventArgs Arguments );
 
 	public class Firefly
 	{
@@ -14,10 +16,10 @@ namespace FireflyGL
 
 		private static Window window;
 
-		private static float updateTime;
+		public static float UpdateTime { get; private set; }
 
-		private static float renderTime;
-		private static float totalTime;
+		public static float RenderTime { get; private set; }
+		public static float TotalTime { get; private set; }
 
 		private static VertexShader defaultShapeVertexShader, defaultTextureVertexShader;
 		private static FragmentShader defaultShapeFragmentShader, defaultTexturedFragmentShader;
@@ -33,14 +35,11 @@ namespace FireflyGL
 		{
 			get
 			{
-				if (window == null) throw new Exception("Window not open, call the Initialize method first");
-				else return window;
+				if ( window == null ) throw new Exception( "Window not open, call the Initialize method first" );
+				return window;
 			}
 			set { window = value; }
 		}
-
-		public static float UpdateTime { get; set; }
-		public static float RenderTime { get; set; }
 
 		public static ShaderProgram DefaultTextureProgram
 		{
@@ -66,43 +65,44 @@ namespace FireflyGL
 			set { windowMatrix = value; }
 		}
 
-		public static void Initialize(int Width, int Height, string Title, OnLoadHandler LoadHandler, bool UseOGL3 = false)
+		public static void Initialize ( int Width, int Height, string Title, OnLoadHandler LoadHandler, bool UseOGL3 = false )
 		{
-			window = new Window(Width, Height, Title, LoadHandler, UseOGL3);
+			window = new Window( Width, Height, Title, LoadHandler, UseOGL3 );
 
+			string exePath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
 			defaultTextureVertexShader = new VertexShader();
-			defaultTextureVertexShader.LoadFromFile(@"shaders\defTextureVert.vert.c");
+			defaultTextureVertexShader.LoadFromFile( exePath + @"\shaders\defTextureVert.vert.c" );
 			defaultTexturedFragmentShader = new FragmentShader();
-			defaultTexturedFragmentShader.LoadFromFile(@"shaders\defTextureFrag.frag.c");
+			defaultTexturedFragmentShader.LoadFromFile( exePath + @"\shaders\defTextureFrag.frag.c" );
 			defaultShapeVertexShader = new VertexShader();
-			defaultShapeVertexShader.LoadFromFile(@"shaders\defShapeVert.vert.c");
+			defaultShapeVertexShader.LoadFromFile( exePath + @"\shaders\defShapeVert.vert.c" );
 			defaultShapeFragmentShader = new FragmentShader();
-			defaultShapeFragmentShader.LoadFromFile(@"shaders\defShapeFrag.frag.c");
+			defaultShapeFragmentShader.LoadFromFile( exePath + @"\shaders\defShapeFrag.frag.c" );
 
-			defaultShapeProgram = new ShaderProgram(defaultShapeVertexShader, defaultShapeFragmentShader);
+			defaultShapeProgram = new ShaderProgram( defaultShapeVertexShader, defaultShapeFragmentShader );
 			defaultShapeProgram.Link();
-			defaultShapeProgram.AddUniformLocation("window_matrix");
-			defaultShapeProgram.AddUniformLocation("model_matrix");
-			defaultShapeProgram.AddUniformLocation("projection_matrix");
-			defaultShapeProgram.AddUniformLocation("camera_matrix");
-			defaultShapeProgram.AddAttribLocation("vertex_coord");
-			defaultShapeProgram.AddAttribLocation("vertex_color");
+			defaultShapeProgram.AddUniformLocation( "window_matrix" );
+			defaultShapeProgram.AddUniformLocation( "model_matrix" );
+			defaultShapeProgram.AddUniformLocation( "projection_matrix" );
+			defaultShapeProgram.AddUniformLocation( "camera_matrix" );
+			defaultShapeProgram.AddAttribLocation( "vertex_coord" );
+			defaultShapeProgram.AddAttribLocation( "vertex_color" );
 
-			defaultTextureProgram = new ShaderProgram(defaultTextureVertexShader, defaultTexturedFragmentShader);
+			defaultTextureProgram = new ShaderProgram( defaultTextureVertexShader, defaultTexturedFragmentShader );
 			defaultTextureProgram.Link();
-			defaultTextureProgram.AddUniformLocation("window_matrix");
-			defaultTextureProgram.AddUniformLocation("model_matrix");
-			defaultTextureProgram.AddUniformLocation("projection_matrix");
-			defaultTextureProgram.AddUniformLocation("camera_matrix");
-			defaultTextureProgram.AddUniformLocation("texture");
-			defaultTextureProgram.AddAttribLocation("vertex_coord");
-			defaultTextureProgram.AddAttribLocation("vertex_texcoord");
+			defaultTextureProgram.AddUniformLocation( "window_matrix" );
+			defaultTextureProgram.AddUniformLocation( "model_matrix" );
+			defaultTextureProgram.AddUniformLocation( "projection_matrix" );
+			defaultTextureProgram.AddUniformLocation( "camera_matrix" );
+			defaultTextureProgram.AddUniformLocation( "texture" );
+			defaultTextureProgram.AddAttribLocation( "vertex_coord" );
+			defaultTextureProgram.AddAttribLocation( "vertex_texcoord" );
 
 			windowMatrix = Matrix4.Identity;
-			projectionMatrix = new Matrix4(new Vector4(2F/window.Width, 0, 0, 0),
-			                               new Vector4(0, -2F/window.Height, 0, 0),
-			                               new Vector4(0, 0, 1, 0),
-			                               new Vector4(0, 0, 0, 1))*Matrix4.CreateTranslation(-1, 1, 0);
+			projectionMatrix = new Matrix4( new Vector4( 2F / window.Width, 0, 0, 0 ),
+										   new Vector4( 0, -2F / window.Height, 0, 0 ),
+										   new Vector4( 0, 0, 1, 0 ),
+										   new Vector4( 0, 0, 0, 1 ) ) * Matrix4.CreateTranslation( -1, 1, 0 );
 
 			var newCam = new Camera();
 			newCam.Activate();
@@ -118,20 +118,20 @@ namespace FireflyGL
 			window.GameWindow.Run();
 		}
 
-		public static void Kill()
+		public static void Kill ()
 		{
 			kill = true;
 		}
 
-		public static void ForceKill()
+		public static void ForceKill ()
 		{
 			window.GameWindow.Close();
 		}
 
-		private static void mainLoop(object sender, EventArgs e)
+		private static void mainLoop ( object sender, EventArgs e )
 		{
-			float updateLock = 1/60F;
-			float renderLock = 1/60F;
+			float updateLock = 1 / 60F;
+			float renderLock = 1 / 60F;
 			float updateOverTime = 0;
 			float renderOverTime = 0;
 			var individualTimer = new Stopwatch();
@@ -144,29 +144,29 @@ namespace FireflyGL
 
 			renderTimer.Start();
 			updateTimer.Start();
-			while (!kill)
+			while ( !kill )
 			{
 				totalTimer.Restart();
 
-				if (renderTimer.ElapsedTicks/(float) Stopwatch.Frequency + renderOverTime > renderLock)
+				if ( renderTimer.ElapsedTicks / (float)Stopwatch.Frequency + renderOverTime > renderLock )
 				{
 					renderTimer.Stop();
-					renderOverTime += renderTimer.ElapsedTicks/(float) Stopwatch.Frequency;
+					renderOverTime += renderTimer.ElapsedTicks / (float)Stopwatch.Frequency;
 					renderOverTime -= renderLock;
 
 					individualTimer.Start();
 					render();
 
 					individualTimer.Stop();
-					renderTime = individualTimer.ElapsedTicks/(float) Stopwatch.Frequency;
+					RenderTime = individualTimer.ElapsedTicks / (float)Stopwatch.Frequency;
 					individualTimer.Reset();
 
 					renderTimer.Restart();
 				}
-				if (updateTimer.ElapsedTicks/(float) Stopwatch.Frequency + updateOverTime > updateLock)
+				if ( updateTimer.ElapsedTicks / (float)Stopwatch.Frequency + updateOverTime > updateLock )
 				{
 					updateTimer.Stop();
-					updateOverTime += updateTimer.ElapsedTicks/(float) Stopwatch.Frequency;
+					updateOverTime += updateTimer.ElapsedTicks / (float)Stopwatch.Frequency;
 					updateOverTime -= updateLock;
 
 					individualTimer.Start();
@@ -175,39 +175,39 @@ namespace FireflyGL
 					update();
 
 					individualTimer.Stop();
-					updateTime = individualTimer.ElapsedTicks/(float) Stopwatch.Frequency;
+					UpdateTime = individualTimer.ElapsedTicks / (float)Stopwatch.Frequency;
 					individualTimer.Reset();
 
 					updateTimer.Restart();
 				}
 
-				if (totalTimer.ElapsedMilliseconds > 1)
+				if ( totalTimer.ElapsedMilliseconds > 1 )
 				{
 					totalTimer.Stop();
-					totalTime = totalTimer.ElapsedTicks/(float) Stopwatch.Frequency*1000;
+					TotalTime = totalTimer.ElapsedTicks / (float)Stopwatch.Frequency * 1000;
 				}
 			}
 		}
 
-		private static void setupOpenGL()
+		private static void setupOpenGL ()
 		{
-			GL.Enable(EnableCap.Blend);
-			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-			GL.Enable(EnableCap.Multisample);
+			GL.Enable( EnableCap.Blend );
+			GL.BlendFunc( BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha );
+			GL.Enable( EnableCap.Multisample );
 			Utility.ProcessOGLErrors();
 		}
 
-		private static void render()
+		private static void render ()
 		{
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			GL.Clear( ClearBufferMask.ColorBufferBit );
 
-			foreach (IRenderable renderable in renderRemoveList)
+			foreach ( IRenderable renderable in renderRemoveList )
 			{
-				renderList.Remove(renderable);
+				renderList.Remove( renderable );
 			}
 			renderRemoveList.Clear();
 
-			for (LinkedListNode<IRenderable> node = renderList.First; node != null; node = node.Next)
+			for ( LinkedListNode<IRenderable> node = renderList.First ; node != null ; node = node.Next )
 			{
 				node.Value.Render();
 			}
@@ -215,62 +215,61 @@ namespace FireflyGL
 			try
 			{
 				window.GameWindow.SwapBuffers();
-			}
-			catch (Exception e)
+			} catch ( Exception e )
 			{
 				string stupidWarningMessages = e.Message;
 				Kill();
 			}
 		}
 
-		private static void update()
+		private static void update ()
 		{
 			window.GameWindow.Title =
-				"UpdateTime( " + updateList.Count + " ): " + (int) (updateTime*1000) +
-				" RenderTime( " + renderList.Count + " ): " + (int) (renderTime*1000) +
-				" TotalTime: " + (int) totalTime;
+				"UpdateTime( " + updateList.Count + " ): " + (int)( UpdateTime * 1000 ) +
+				" RenderTime( " + renderList.Count + " ): " + (int)( RenderTime * 1000 ) +
+				" TotalTime: " + (int)TotalTime;
 
-			foreach (IUpdatable updatable in updateRemoveList)
+			foreach ( IUpdatable updatable in updateRemoveList )
 			{
-				updateList.Remove(updatable);
+				updateList.Remove( updatable );
 			}
 			updateRemoveList.Clear();
 
-			for (LinkedListNode<IUpdatable> node = updateList.First; node != null; node = node.Next)
+			for ( LinkedListNode<IUpdatable> node = updateList.First ; node != null ; node = node.Next )
 			{
 				node.Value.Update();
 			}
 		}
 
-		public static void AddToUpdateList(IUpdatable Updatable)
+		public static void AddToUpdateList ( IUpdatable Updatable )
 		{
-			updateList.AddLast(Updatable);
+			updateList.AddLast( Updatable );
 		}
 
-		public static void RemoveFromUpdateList(IUpdatable Updatable)
+		public static void RemoveFromUpdateList ( IUpdatable Updatable )
 		{
-			updateRemoveList.AddLast(Updatable);
+			updateRemoveList.AddLast( Updatable );
 		}
 
-		public static void AddToRenderList(IRenderable Renderable)
+		public static void AddToRenderList ( IRenderable Renderable )
 		{
-			renderList.AddLast(Renderable);
+			renderList.AddLast( Renderable );
 		}
 
-		public static void RemoveFromRenderList(IRenderable Renderable)
+		public static void RemoveFromRenderList ( IRenderable Renderable )
 		{
-			renderRemoveList.AddLast(Renderable);
+			renderRemoveList.AddLast( Renderable );
 		}
 
-		public static void RemoveEntity(object Entity)
+		public static void RemoveEntity ( object Entity )
 		{
-			if (Entity is IUpdatable)
+			if ( Entity is IUpdatable )
 			{
-				updateRemoveList.AddLast(Entity as IUpdatable);
+				updateRemoveList.AddLast( Entity as IUpdatable );
 			}
-			if (Entity is IRenderable)
+			if ( Entity is IRenderable )
 			{
-				renderRemoveList.AddLast(Entity as IRenderable);
+				renderRemoveList.AddLast( Entity as IRenderable );
 			}
 		}
 	}

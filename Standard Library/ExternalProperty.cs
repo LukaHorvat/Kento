@@ -1,23 +1,38 @@
-﻿namespace Kento
-{
-	internal delegate Value EvaluateBinding();
+﻿using System;
 
+namespace Kento
+{
 	internal class ExternalProperty : ExternalMember
 	{
-		private readonly EvaluateBinding getter;
+		public Value Value { get; set; }
+		public ChangeHandler OnChange { get; set; }
+		public ExternalGetter External { get; set; }
 
-		public ExternalProperty(string Name, bool Static, EvaluateBinding Getter)
+		public ExternalProperty ( string Name, bool Static, ChangeHandler OnChange, Value Value )
+		{
+			this.OnChange = OnChange;
+			this.Static = Static;
+			Representation = Name;
+			this.Value = Value;
+		}
+		public ExternalProperty ( string Name, bool Static, ChangeHandler OnChange, ExternalGetter External )
+		{
+			this.OnChange = OnChange;
+			this.Static = Static;
+			Representation = Name;
+			this.External = External;
+		}
+		public ExternalProperty ( string Name, bool Static, Value Value )
 		{
 			this.Static = Static;
 			Representation = Name;
-			getter = Getter;
+			this.Value = Value;
 		}
-
-		public override Value Evaluate()
+		public ExternalProperty ( string Name, bool Static, ExternalGetter External )
 		{
-			Value toReturn = getter();
-			toReturn.Static = Static;
-			return toReturn;
+			this.Static = Static;
+			Representation = Name;
+			this.External = External;
 		}
 	}
 }

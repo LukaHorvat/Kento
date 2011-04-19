@@ -6,29 +6,36 @@ namespace Kento
 	{
 		#region ILibrarySegment Members
 
-		public ExternalClass Load()
+		public ExternalClass Load ()
 		{
-			var output = new ExternalFunction("Output", true, Output);
-			var input = new ExternalFunction("Input", true, Input);
+			var output = new ExternalFunction( "Output", true, Output );
+			var input = new ExternalFunction( "Input", true, Input );
 
-			return new ExternalClass("Console", InstanceFlags.NoFlags, output, input);
+			return new ExternalClass( "Console", InstanceFlags.NoFlags, output, input,
+				new ExternalFunction( "Clear", true, Clear ) );
 		}
 
 		#endregion
 
-		public Value Output(Array Arguments)
+		public Value Output ( Array Arguments )
 		{
-			foreach (Reference val in Arguments.Arr)
+			foreach ( Reference val in Arguments.Arr )
 			{
-				Console.Write(val.ReferencingValue.ToString());
+				Console.Write( val.ReferencingValue.ToString() );
 			}
 			Console.WriteLine();
 			return NoValue.Value;
 		}
 
-		public Value Input(Array Arguments)
+		public Value Input ( Array Arguments )
 		{
-			return new String(Console.ReadLine());
+			return new String( Console.ReadLine() );
+		}
+
+		public Value Clear ( Array Arguments )
+		{
+			Console.Clear();
+			return NoValue.Value;
 		}
 	}
 }

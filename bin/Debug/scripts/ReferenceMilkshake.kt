@@ -17,4 +17,4 @@ while (i<3) {
 	Console.Output(Yard[i] + " " + typeof Yard[i])
 	i++
 }
-Console.Output(System.GetTime())
+Console.Output(System.Time)

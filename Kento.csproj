@@ -100,9 +100,11 @@
     <Compile Include="Objects\String.cs" />
     <Compile Include="Scope.cs" />
     <Compile Include="Standard Library\Array\SLArray.cs" />
-    <Compile Include="Standard Library\Firefly\SLColor.cs" />
+    <Compile Include="Standard Library\Firefly\Structs\SLPolygon.cs" />
+    <Compile Include="Standard Library\Firefly\Structs\SLColor.cs" />
     <Compile Include="Standard Library\Firefly\SLFirefly.cs" />
     <Compile Include="Standard Library\Firefly\SLWindow.cs" />
+    <Compile Include="Standard Library\Firefly\SLColoredShape.cs" />
     <Compile Include="Standard Library\Math\SLMath.cs" />
     <Compile Include="Standard Library\System\SLConsole.cs" />
     <Compile Include="Standard Library\ExternalBinding.cs" />

@@ -1,66 +1,105 @@
 ﻿namespace Kento
 {
+	public delegate void ChangeHandler ( Value NewValue );
+	public delegate Value ExternalGetter ();
+
 	public class Reference : Value
 	{
-		protected int Index;
+		public int Index { get; set; }
+		public bool Accessable { get; set; }
+		public ChangeHandler OnChange { get; set; }
+		public ExternalGetter External { get; set; }
+		public string Identifier { get; set; }
 
-		public Reference(Value ValueToReference)
-			: this(ValueToReference is Reference ? (ValueToReference as Reference).Index : Compiler.StoreValue(ValueToReference)) {}
-
-		public Reference(Reference Reference)
-			: this(Reference.Index) {}
-
-		public Reference(int Index)
+		public Reference ( ExternalMember Member )
 		{
-			Static = Compiler.GetValue(Index).Static;
+			Static = Member.Static;
+			Value toStore;
+			if ( Member is ExternalProperty )
+			{
+				var prop = Member as ExternalProperty;
+				toStore = prop.Value;
+				if ( prop.OnChange != null ) OnChange = prop.OnChange;
+				if ( prop.External != null ) External = prop.External;
+			} else toStore = Member;
+			Index = Compiler.StoreValue( toStore, Member );
+			Compiler.RegisterReference( this, Index );
+		}
+
+		public Reference ( Value ValueToReference )
+			: this( ValueToReference is Reference ? ( ValueToReference as Reference ).Index : Compiler.StoreValue( ValueToReference, ValueToReference ) ) { }
+
+		public Reference ( Reference Reference )
+			: this( Reference.Index ) { }
+
+		public Reference ( int Index )
+		{
+			Static = Compiler.GetValue( Index ).Static;
 			this.Index = Index;
-			if (this.Index != -1) //NullReference case
-				Compiler.RegisterReference(this, this.Index);
+			if ( this.Index != -1 ) //NullReference case
+				Compiler.RegisterReference( this, this.Index );
 		}
 
 		public Value ReferencingValue
 		{
 			get
 			{
-				Value toReturn = Compiler.GetValue(Index);
-				if (toReturn is ExternalProperty) toReturn = toReturn.Evaluate();
+				if ( External != null ) return External();
+				Value toReturn = Compiler.GetValue( Index );
 				return toReturn;
 			}
-			set { Compiler.SetValue(Index, value); }
+			set
+			{
+				if ( OnChange != null )
+				{
+					Compiler.SetValue( Index, value );
+					OnChange( value );
+				} else
+				{
+					ChangeReference( value );
+				}
+			}
 		}
 
-		public void ChangeReference(Reference Reference)
+		public void ChangeReference ( Value Value )
 		{
-			Index = Reference.Index;
+			ChangeReference( Compiler.StoreValue( Value, Value ) );
 		}
 
-		public void ChangeReference(int Index)
+		public void ChangeReference ( Reference Reference )
 		{
-			Dereference();
+			ChangeReference( Reference.Index );
+		}
+
+		public void ChangeReference ( int Index )
+		{
+			Compiler.Dereference( this, this.Index );
 			this.Index = Index;
-			Compiler.RegisterReference(this, this.Index);
+			Compiler.RegisterReference( this, this.Index );
 		}
 
-		public override Value Clone()
+		public override Value Clone ()
 		{
-			return new Reference(ReferencingValue.Clone());
+			return this;
 		}
 
-		public HardReference GetHardReference()
+		public HardReference GetHardReference ()
 		{
-			return new HardReference(Index);
+			return new HardReference( Index );
 		}
 
-		public virtual void Dereference()
+		public virtual void Dereference ()
 		{
-			Compiler.Deference(this, Index);
+			Accessable = false;
+			if ( Index == -1 ) return;
+			Compiler.Dereference( this, Index );
 			Index = -1;
 		}
 
-		public override bool Equals(object Obj)
+		public override bool Equals ( object Obj )
 		{
 			var reference = Obj as Reference;
-			if (reference != null)
+			if ( reference != null )
 			{
 				int myIndex = Index;
 				int referenceIndex = reference.Index;
@@ -69,14 +108,14 @@
 			return false;
 		}
 
-		public override int GetHashCode()
+		public override int GetHashCode ()
 		{
 			return Index;
 		}
 
-		public override string ToString()
+		public override string ToString ()
 		{
-			return ReferencingValue.ToString();
+			return "RefTo: " + ReferencingValue;
 		}
 	}
 
@@ -84,8 +123,8 @@
 	{
 		private static NullReference value = new NullReference();
 
-		public NullReference()
-			: base(-1) {}
+		public NullReference ()
+			: base( -1 ) { }
 
 		public static NullReference Value
 		{

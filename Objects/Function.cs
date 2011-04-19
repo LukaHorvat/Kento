@@ -27,6 +27,11 @@ namespace Kento
 
 		#region IFunction Members
 
+		public virtual Value Invoke ()
+		{
+			return Invoke( Array.Empty );
+		}
+
 		public virtual Value Invoke ( Array Args )
 		{
 			Compiler.SetAsCurrentScope( scope );
@@ -45,15 +50,6 @@ namespace Kento
 		public override Value Clone ()
 		{
 			return new Function( args, Value, scope );
-		}
-
-		public Value Invoke ()
-		{
-			Compiler.SetAsCurrentScope( scope );
-			Compiler.EnterScope();
-			Value result = Run();
-			Compiler.ExitScope( true );
-			return result;
 		}
 	}
 }

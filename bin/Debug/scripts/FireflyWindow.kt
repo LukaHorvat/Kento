@@ -1,5 +1,4 @@
-OnLoad = function () {
-	Firefly.SetBackgroundColor( new Color(0.39, 0.58, 0.92) )
-	Console.Output("Scripting... Bitch!")
-}
-Firefly.Initialize(OnLoad)
+Outer = new Array(5)
+Outer[0] = new Array()
+Outer[0].Add(2)
+Console.Output(Outer[0][0])

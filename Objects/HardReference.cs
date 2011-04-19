@@ -2,22 +2,42 @@
 {
 	public class HardReference : Reference
 	{
-		public HardReference(int Index)
-			: base(Index) {}
+		public HardReference ( int Index )
+			: base( Index ) { }
 
-		public override Value Clone()
+		public override Value Clone ()
 		{
-			return new Reference(Index);
+			return this;
 		}
 
-		public void ForceFree()
+		public void ForceFree ()
 		{
-			Compiler.FreeMemory(Index);
+			Accessable = false;
+			if ( Index == -1 ) return;
+			Compiler.Dereference( this, Index );
+			Index = -1;
 		}
 
-		public override Array ToArray()
+		public Reference ToNormalReference ()
 		{
-			return new Array(this);
+			var toReturn = new Reference( Index );
+			ForceFree();
+			return toReturn;
+		}
+
+		public override Array ToArray ()
+		{
+			return new Array( this );
+		}
+
+		public override void Dereference ()
+		{
+			//Hard reference can't get dereferenced automatically
+		}
+
+		public override string ToString ()
+		{
+			return "HardRefTo: " + ReferencingValue;
 		}
 	}
 }

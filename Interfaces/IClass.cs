@@ -2,6 +2,7 @@
 {
 	public interface IClass : IHasMembers
 	{
-		Instance MakeInstance();
+		Instance MakeInstance ();
+		string Name { get; set; }
 	}
 }

@@ -6,7 +6,7 @@ namespace Kento
 	{
 		private double value;
 
-		public Number(double Value)
+		public Number ( double Value )
 		{
 			value = Value;
 		}
@@ -17,19 +17,19 @@ namespace Kento
 			set { this.value = value; }
 		}
 
-		public override string ToString()
+		public override string ToString ()
 		{
 			return value.ToString();
 		}
 
-		public override Value Clone()
+		public override Value Clone ()
 		{
-			return new Number(value);
+			return new Number( value );
 		}
 
-		public override int CompareTo(Value Other)
+		public override int CompareTo ( Value Other )
 		{
-			if (Other is Number) return (int) Math.Ceiling(value - (Other as Number).value);
+			if ( Other is Number ) return (int)Math.Ceiling( value - ( Other as Number ).value );
 			return 1;
 		}
 	}

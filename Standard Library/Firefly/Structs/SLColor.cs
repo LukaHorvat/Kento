@@ -28,7 +28,7 @@ namespace Kento
 		{
 			return new ExternalClass( "Color", InstanceFlags.NoFlags, typeof( SLColor ) );
 		}
-		public override Value Invoke ( Array Arguments )
+		public override Value Invoke (Array Arguments)
 		{
 			if ( Arguments.Arr.Count == 3 )
 			{

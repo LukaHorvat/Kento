@@ -9,7 +9,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace FireflyGL
 {
-	internal struct Rectangle
+	public struct Rectangle
 	{
 		public float Height;
 		public float Width;
@@ -24,7 +24,7 @@ namespace FireflyGL
 		}
 	}
 
-	internal class Utility
+	public class Utility
 	{
 		private static readonly Stopwatch timer = new Stopwatch();
 		private static readonly Random rand = new Random();

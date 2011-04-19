@@ -11,13 +11,15 @@ namespace Kento
 
 	public class Instance : Value, IFunction, IHasMembers
 	{
-		public Instance(IClass Type)
-			: this(Type.Identifiers, Type.Flags) {}
+		public string ClassName { get; set; }
 
-		public Instance(InstanceFlags Flags)
-			: this(new Scope(), Flags) {}
+		public Instance ( IClass Type )
+			: this( Type.Identifiers, Type.Flags ) { ClassName = Type.Name; }
 
-		public Instance(Scope Identifiers, InstanceFlags Flags)
+		public Instance ( InstanceFlags Flags )
+			: this( new Scope(), Flags ) { }
+
+		public Instance ( Scope Identifiers, InstanceFlags Flags )
 		{
 			this.Flags = Flags;
 			this.Identifiers = Identifiers.Clone();
@@ -26,12 +28,12 @@ namespace Kento
 
 		#region IFunction Members
 
-		public virtual Value Invoke(Array Arguments)
+		public virtual Value Invoke ( Array Arguments )
 		{
-			if (Identifiers.ContainsKey("Constructor"))
+			if ( Identifiers.ContainsKey( "Constructor" ) )
 			{
-				Value constructor = Identifiers["Constructor"].ReferencingValue;
-				if (constructor is IFunction) (constructor as IFunction).Invoke(Arguments);
+				Value constructor = Identifiers[ "Constructor" ].ReferencingValue;
+				if ( constructor is IFunction ) ( constructor as IFunction ).Invoke( Arguments );
 			}
 			return this;
 		}
@@ -45,20 +47,34 @@ namespace Kento
 
 		#endregion
 
-		private void RewireFunctions()
+		private void RewireFunctions ()
 		{
-			foreach (var pair in Identifiers)
+			foreach ( var pair in Identifiers )
 			{
-				if (pair.Value.ReferencingValue is Function)
+				if ( pair.Value.ReferencingValue is Function )
 				{
-					(pair.Value.ReferencingValue as Function).Scope = Identifiers;
+					( pair.Value.ReferencingValue as Function ).Scope = Identifiers;
 				}
 			}
 		}
 
-		public override Value Clone()
+		public override Value Clone ()
 		{
-			return new Instance(Identifiers, Flags);
+			return new Instance( Identifiers, Flags );
 		}
+
+		public override void Destroy ()
+		{
+			foreach ( var pair in Identifiers )
+			{
+				pair.Value.Dereference();
+			}
+		}
+
+		public override string ToString ()
+		{
+			return "Instance of " + ClassName;
+		}
+
 	}
 }
