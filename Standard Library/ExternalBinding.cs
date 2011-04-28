@@ -1,12 +1,12 @@
 ﻿namespace Kento
 {
-	public class ExternalBinding : Value
+	public class ExternalBinding : Value, INamable
 	{
-		public string Representation { get; set; }
+		public string Name { get; set; }
 
 		public override string ToString ()
 		{
-			return Representation;
+			return Name;
 		}
 	}
 }

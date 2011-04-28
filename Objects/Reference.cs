@@ -1,33 +1,82 @@
-﻿namespace Kento
+﻿using System;
+
+namespace Kento
 {
 	public delegate void ChangeHandler ( Value NewValue );
 	public delegate Value ExternalGetter ();
 
 	public class Reference : Value
 	{
-		public int Index { get; set; }
+		static long nextID;
+		public static long NextID { get { return nextID++; } }
+
+		int index = -1;
+		public int Index
+		{
+			get { return index; }
+			set
+			{
+				if ( index != -1 ) Dereference();
+				index = value;
+				if ( index != -1 )
+				{
+					Compiler.RegisterReference( this, index );
+					Accessable = true;
+				}
+			}
+		}
 		public bool Accessable { get; set; }
 		public ChangeHandler OnChange { get; set; }
 		public ExternalGetter External { get; set; }
 		public string Identifier { get; set; }
+		public long ID { get; private set; }
+
+		public Value ReferencingValue
+		{
+			get
+			{
+				if ( External != null )
+				{
+					var toReturn = External();
+
+					return toReturn;
+				}
+				return Compiler.GetValue( Index );
+
+			}
+			set
+			{
+				if ( OnChange != null )
+				{
+					if ( ReferencingValue.GetType() == value.GetType() )
+					{
+						Compiler.SetValue( Index, value );
+						OnChange( value );
+					} else throw new Exception( "Can't set a value with an attached OnChange event to a value of different type" );
+				} else
+				{
+					ChangeReference( value );
+				}
+			}
+		}
 
 		public Reference ( ExternalMember Member )
 		{
 			Static = Member.Static;
-			Value toStore;
 			if ( Member is ExternalProperty )
 			{
 				var prop = Member as ExternalProperty;
-				toStore = prop.Value;
 				if ( prop.OnChange != null ) OnChange = prop.OnChange;
 				if ( prop.External != null ) External = prop.External;
-			} else toStore = Member;
-			Index = Compiler.StoreValue( toStore, Member );
+			}
+			Value toStore = Member;
+			ID = NextID;
+			Index = Compiler.StoreValue( toStore );
 			Compiler.RegisterReference( this, Index );
 		}
 
-		public Reference ( Value ValueToReference )
-			: this( ValueToReference is Reference ? ( ValueToReference as Reference ).Index : Compiler.StoreValue( ValueToReference, ValueToReference ) ) { }
+		public Reference ( Value ValueToReference, bool ForceNew = false )
+			: this( Compiler.StoreValue( ValueToReference, ForceNew ) ) { }
 
 		public Reference ( Reference Reference )
 			: this( Reference.Index ) { }
@@ -36,34 +85,12 @@
 		{
 			Static = Compiler.GetValue( Index ).Static;
 			this.Index = Index;
-			if ( this.Index != -1 ) //NullReference case
-				Compiler.RegisterReference( this, this.Index );
-		}
-
-		public Value ReferencingValue
-		{
-			get
-			{
-				if ( External != null ) return External();
-				Value toReturn = Compiler.GetValue( Index );
-				return toReturn;
-			}
-			set
-			{
-				if ( OnChange != null )
-				{
-					Compiler.SetValue( Index, value );
-					OnChange( value );
-				} else
-				{
-					ChangeReference( value );
-				}
-			}
+			ID = NextID;
 		}
 
 		public void ChangeReference ( Value Value )
 		{
-			ChangeReference( Compiler.StoreValue( Value, Value ) );
+			ChangeReference( Compiler.StoreValue( Value ) );
 		}
 
 		public void ChangeReference ( Reference Reference )
@@ -73,14 +100,18 @@
 
 		public void ChangeReference ( int Index )
 		{
-			Compiler.Dereference( this, this.Index );
 			this.Index = Index;
-			Compiler.RegisterReference( this, this.Index );
 		}
 
 		public override Value Clone ()
 		{
-			return this;
+			if ( ReferencingValue is Literal ) return CloneWithValue();
+			return new Reference( Index ) { Accessable = true };
+		}
+
+		public Reference CloneWithValue ()
+		{
+			return new Reference( ReferencingValue.Clone() );
 		}
 
 		public HardReference GetHardReference ()
@@ -91,9 +122,7 @@
 		public virtual void Dereference ()
 		{
 			Accessable = false;
-			if ( Index == -1 ) return;
 			Compiler.Dereference( this, Index );
-			Index = -1;
 		}
 
 		public override bool Equals ( object Obj )
@@ -115,7 +144,8 @@
 
 		public override string ToString ()
 		{
-			return "RefTo: " + ReferencingValue;
+			if ( ReferencingValue == null ) return "Null Reference";
+			return "Reference(" + ID + ")<" + ReferencingValue + ">";
 		}
 	}
 

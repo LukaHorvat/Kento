@@ -1,8 +1,7 @@
 ﻿namespace Kento
 {
-	public interface IClass : IHasMembers
+	public interface IClass : IHasMembers, INamable
 	{
 		Instance MakeInstance ();
-		string Name { get; set; }
 	}
 }

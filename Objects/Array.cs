@@ -5,29 +5,23 @@ using System.Text;
 
 namespace Kento
 {
-	public class Array : Instance, IIndexable
+	public class Array : Instance, ILibrarySegment, IIndexable
 	{
 		private static Array empty = new Array();
-		public static Array Empty
-		{
-			get { return empty; }
-		}
+		public static Array Empty { get { return empty; } }
 
 		private List<int> dimensions;
 
 		public List<Reference> Arr { get; set; }
 
 		public Array ()
-			: this( new List() ) { }
-
-		public Array ( Value Single )
-			: this( new List( Single ) ) { }
+			: this( new List<Reference>() ) { }
 
 		public Array ( HardReference HardRef )
 			: this( new[] { HardRef }.ToList<Reference>() ) { }
 
 		public Array ( List List )
-			: this( List.Arr.Select( X => new Reference( X ) ).ToList() ) { }
+			: this( List.Arr.Select( X => ( new Reference( X is Literal ? X.Clone() : X ) { Accessable = true } ) ).ToList() ) { }
 
 		public Array ( List<Reference> List )
 			: base( InstanceFlags.Indexable )
@@ -42,17 +36,18 @@ namespace Kento
 			Identifiers[ "Insert" ] = new Reference( new ExternalFunction( "Insert", false, Insert ) );
 			Identifiers[ "Max" ] = new Reference( new ExternalFunction( "Max", false, Max ) );
 			Identifiers[ "Min" ] = new Reference( new ExternalFunction( "Min", false, Min ) );
+
 		}
 		#region Members
 
-		private Value PopLast ( Array Arguments )
+		private Value PopLast ( List Arguments )
 		{
 			var toReturn = Arr.Last();
 			Arr.RemoveAt( Arr.Count - 1 );
 			return toReturn;
 		}
 
-		private Value PopFirst ( Array Arguments )
+		private Value PopFirst ( List Arguments )
 		{
 			var toReturn = Arr.First();
 			Arr.RemoveAt( 0 );
@@ -64,22 +59,21 @@ namespace Kento
 			return new Number( Arr.Count );
 		}
 
-		public Value Add ( Array Arguments )
+		public Value Add ( List Arguments )
 		{
 			for ( int index = 0 ; index < Arguments.Arr.Count ; index++ )
 			{
-				Reference reference = new Reference( Arguments.Arr[ index ] );
-				reference.Accessable = true;
-				Arr.Add( reference );
+				Arr.Add( new Reference( Arguments.Arr[ index ] ) { Accessable = true } );
 			}
 			return this;
 		}
 
-		public Value Remove ( Array Arguments )
+		public Value Remove ( List Arguments )
 		{
 			for ( int index = 0 ; index < Arguments.Arr.Count ; index++ )
 			{
-				Reference reference = Arguments.Arr[ index ];
+#warning FIX THIS METHOD
+				var reference = Arguments.Arr[ index ] as Reference;
 				for ( int i = 0 ; i < Arr.Count ; ++i )
 				{
 					if ( Arr[ i ].Equals( reference ) )
@@ -92,12 +86,11 @@ namespace Kento
 			return this;
 		}
 
-		public Value RemoveAt ( Array Arguments )
+		public Value RemoveAt ( List Arguments )
 		{
 			for ( int i = 0 ; i < Arguments.Arr.Count ; i++ )
 			{
-				Reference reference = Arguments.Arr[ i ];
-				Value value = reference.ReferencingValue;
+				Value value = Arguments.GetValue( i );
 				if ( value is Number )
 				{
 					var index = (int)( value as Number ).Val;
@@ -107,35 +100,35 @@ namespace Kento
 			return this;
 		}
 
-		public Value Insert ( Array Arguments )
+		public Value Insert ( List Arguments )
 		{
-			Value first = Arguments.Arr[ 0 ].ReferencingValue;
+			Value first = Arguments.GetValue( 0 );
 			int index;
 			if ( first is Number )
 			{
 				index = (int)( ( first as Number ).Val );
 			} else throw new Exception( "First parameter must be a number" );
 
-			Reference second = Arguments.Arr[ 1 ];
+			var second = Arguments.GetValue( 1 );
 			if ( index >= 0 && index < Arr.Count )
 			{
-				Arr.Insert( index, second );
+				Arr.Insert( index, new Reference( second ) );
 			} else throw new Exception( "Index is out of bounds" );
 			return this;
 		}
 
-		public Value Max ( Array Arguments )
+		public Value Max ( List Arguments )
 		{
-			if ( Arguments.Arr.All( X => X.ReferencingValue is Number ) )
+			if ( Arguments.GetValues().All( X => X is Number ) )
 			{
 				return Arguments.Arr.Max();
 			}
 			throw new Exception( "Max function can only be used on arrays containing only numbers" );
 		}
 
-		public Value Min ( Array Arguments )
+		public Value Min ( List Arguments )
 		{
-			if ( Arguments.Arr.All( X => X.ReferencingValue is Number ) )
+			if ( Arguments.GetValues().All( X => X is Number ) )
 			{
 				return Arguments.Arr.Min();
 			}
@@ -153,10 +146,10 @@ namespace Kento
 		}
 
 		#endregion
-		public override Array ToArray ()
+
+		public override List ToList ()
 		{
-			if ( Arr.Count == 0 ) return this;
-			return base.ToArray();
+			return new List( Arr.ToList<Value>() );
 		}
 
 		public List<T> ToArray<T> ()
@@ -179,25 +172,32 @@ namespace Kento
 			foreach ( var reference in Arr )
 			{
 				var value = reference.ReferencingValue;
-				newList.Add( new Reference( value is Literal ? value.Clone() : value ) );
+				int index = reference.Index;
+				if ( value is Literal )
+				{
+					newList.Add( new Reference( value.Clone() ) );
+				} else
+				{
+					newList.Add( new Reference( index ) );
+				}
 			}
 			return new Array( newList );
 		}
 
-		public override Value Invoke ( Array Arguments )
+		public override Value Invoke ( List Arguments )
 		{
 			dimensions = new List<int>();
-			foreach ( Reference dimension in Arguments.Arr )
+			foreach ( var dimension in Arguments.GetValues() )
 			{
-				if ( dimension.ReferencingValue is Number )
+				if ( dimension is Number )
 				{
-					dimensions.Add( (int)( ( dimension.ReferencingValue as Number ).Val ) );
+					dimensions.Add( (int)( ( dimension as Number ).Val ) );
 				} else
 				{
 					throw new Exception( "Array constructor takes only numbers" );
 				}
 			}
-			List<Reference> toReturn = MakeArray( 0 );
+			var toReturn = MakeArray( 0 );
 			Arr = toReturn;
 			return this;
 		}
@@ -224,7 +224,7 @@ namespace Kento
 			builder.Append( "[" );
 			for ( int i = 0 ; i < Arr.Count ; ++i )
 			{
-				builder.Append( Arr[ i ].ReferencingValue.ToString() );
+				builder.Append( Arr[ i ].ToString() );
 				if ( i < Arr.Count - 1 ) builder.Append( ", " );
 			}
 			builder.Append( "]" );
@@ -237,6 +237,12 @@ namespace Kento
 			{
 				reference.Dereference();
 			}
+			if ( Identifiers.ContainsKey( "this" ) )
+			{
+				Compiler.FreeMemoy( Identifiers[ "this" ].Index );
+				Identifiers.Remove( "this" );
+			}
+			Identifiers.Destroy();
 		}
 
 		public void LiteralClone ()
@@ -251,5 +257,14 @@ namespace Kento
 				}
 			}
 		}
+
+		#region ILibrarySegment Members
+
+		public ExternalClass Load ()
+		{
+			return new ExternalClass( "Array", InstanceFlags.Indexable, typeof( Array ) );
+		}
+
+		#endregion
 	}
 }

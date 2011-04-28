@@ -3,42 +3,43 @@ using System.Collections.Generic;
 
 namespace Kento
 {
-	internal class Function : CodeBlock, IFunction
+	internal class Function : CodeBlock, IInvokable
 	{
 		private readonly List<String> args;
-		private Scope scope;
+		public Scope Scope { get; set; }
+		public string Name { get; set; }
 
-		public Function ( Array Arguments, CodeBlock Code, Scope Scope )
-			: this( Arguments.ToArray<String>(), Code.Value, Scope ) { }
+		public Function ( List Arguments, CodeBlock Code, Scope Scope )
+			: this( Arguments.GetValues().ConvertAll( X => X as String ), Code.Value, Scope ) { }
 
 		public Function ( List<String> Arguments, List<Token> Code, Scope Scope )
 			: base( Code )
 		{
-			scope = Scope;
+			this.Scope = Scope;
 			args = Arguments;
 			Type = CodeBlockType.Function;
 		}
 
-		public Scope Scope
-		{
-			get { return scope; }
-			set { scope = value; }
-		}
-
-		#region IFunction Members
+		#region IInvokable Members
 
 		public virtual Value Invoke ()
 		{
-			return Invoke( Array.Empty );
+			return Invoke( List.Empty );
 		}
 
-		public virtual Value Invoke ( Array Args )
+		public virtual Value Invoke ( List Args )
 		{
-			Compiler.SetAsCurrentScope( scope );
+			Compiler.SetAsCurrentScope( Scope );
 			Compiler.EnterScope();
 			for ( int i = 0 ; i < Math.Min( Args.Arr.Count, args.Count ) ; ++i )
 			{
-				Compiler.SetAlias( args[ i ].Val, Args.Arr[ i ] );
+				if ( Args.Arr[ i ] is Reference )
+				{
+					( (Reference)new Identifier( args[ i ].Val ).Evaluate() ).ChangeReference( Args.Arr[ i ] as Reference );
+				} else
+				{
+					( (Reference)new Identifier( args[ i ].Val ).Evaluate() ).ChangeReference( Args.Arr[ i ] );
+				}
 			}
 			Value result = Run();
 			Compiler.ExitScope( true );
@@ -49,7 +50,12 @@ namespace Kento
 
 		public override Value Clone ()
 		{
-			return new Function( args, Value, scope );
+			return new Function( args, Value, Scope );
+		}
+
+		public override string ToString ()
+		{
+			return "Function: " + Name;
 		}
 	}
 }

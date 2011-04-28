@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Kento.Utility;
 
 namespace Kento
@@ -73,27 +74,15 @@ namespace Kento
 			for ( LinkedListNode<Scope> node = scopeList.Last ; node != null ; node = node.Previous )
 			{
 				if ( node.Value.ContainsKey( Name ) ) return node.Value[ Name ];
+				if ( node.Value.Blocking ) break;
 			}
+			if ( GlobalScope.ContainsKey( Name ) ) return GlobalScope[ Name ];
 			return NullReference.Value;
 		}
 
 		public static void SetAlias ( string Name, Reference Reference )
 		{
 			Reference.Accessable = true;
-			bool set = false;
-			for ( LinkedListNode<Scope> node = scopeList.Last ; node != null ; node = node.Previous )
-			{
-				if ( node.Value.ContainsKey( Name ) )
-				{
-					node.Value[ Name ] = Reference;
-					set = true;
-				}
-			}
-			if ( !set ) scopeList.Last.Value[ Name ] = Reference;
-		}
-
-		public static void SetAliasInCurrentScope ( string Name, Reference Reference )
-		{
 			scopeList.Last.Value[ Name ] = Reference;
 		}
 
@@ -102,13 +91,9 @@ namespace Kento
 			SetAlias( Name, new Reference( Index ) );
 		}
 
-		public static void SetAliasInCurrentScope ( string Name, int Index )
-		{
-			SetAliasInCurrentScope( Name, new Reference( Index ) );
-		}
-
 		public static void SetAsCurrentScope ( Scope Scope )
 		{
+			Scope.Blocking = true;
 			scopeList.AddLast( Scope );
 		}
 
@@ -131,10 +116,11 @@ namespace Kento
 			{
 				if ( !reference.Accessable )
 				{
-					if ( Options.OutputDestruction ) Console.WriteLine( "Destroying reference identifiable by: " + reference.Identifier );
+					if ( Options.OutputDestruction ) Console.WriteLine( "[DEBUG] Destroying reference identifiable by: " + reference.Identifier );
 					reference.Dereference();
 				}
 			}
+			scope.Blocking = false;
 			scopeList.RemoveLast();
 		}
 
@@ -143,8 +129,11 @@ namespace Kento
 			return scopeList.Last.Value;
 		}
 
-		public static int StoreValue ( Value Value, object Sender, bool ForceNew = false )
+		public static int StoreValue ( Value Value, bool ForceNew = false )
 		{
+			if ( Value is Reference ) return ( Value as Reference ).Index;
+			if ( Value is Literal ) ForceNew = true;
+
 			int foundIndex = memory.IndexOf( Value );
 			if ( !ForceNew && foundIndex != -1 ) return foundIndex;
 
@@ -159,19 +148,25 @@ namespace Kento
 				memory.Add( Value );
 				referenceList.Add( new LinkedList<Reference>() );
 			}
-			if ( Options.OutputMemoryAllocation ) Console.WriteLine( "[DEBUG] New memory reservation at {0} ({1})", index, Sender.ToString() );
+			if ( Options.OutputMemoryAllocation ) Console.WriteLine( "[DEBUG] New memory reservation at {0}", index );
 			return index;
 		}
 
-		public static void FreeMemory ( int Index )
+		public static void Destroy ( int Index )
 		{
 			memory[ Index ].Destroy();
+			FreeMemoy( Index );
+		}
+
+		public static void FreeMemoy ( int Index )
+		{
 			memory[ Index ] = null;
 			availabilityStack.Push( Index );
 		}
 
 		public static void RegisterReference ( Reference Reference, int Index )
 		{
+			if ( memory[ Index ] == null ) return;
 			referenceList[ Index ].AddLast( Reference );
 			if ( scopeList.Count > 0 )
 			{
@@ -185,10 +180,9 @@ namespace Kento
 		public static void Dereference ( Reference Reference, int Index )
 		{
 			referenceList[ Index ].Remove( Reference );
-			if ( referenceList[ Index ].Count == 0 )
-			{
-				FreeMemory( Index );
-			}
+
+			if ( memory[ Index ] == null ) return;
+			if ( referenceList[ Index ].Count == 0 ) Destroy( Index );
 		}
 
 		public static void Run ( List<Token> Code )
@@ -226,7 +220,7 @@ namespace Kento
 
 		internal static Reference Reserve ( object Sender )
 		{
-			return new Reference( StoreValue( NoValue.Value, Sender, true ) );
+			return new Reference( StoreValue( NoValue.Value, true ) );
 		}
 
 		public static int GetMemoryUsage ()

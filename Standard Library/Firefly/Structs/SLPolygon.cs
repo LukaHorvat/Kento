@@ -15,9 +15,9 @@ namespace Kento
 		{
 			return new ExternalClass( "Polygon", InstanceFlags.NoFlags, typeof( SLPolygon ) );
 		}
-		public override Value Invoke (Array Arguments)
+		public override Value Invoke ( List Arguments )
 		{
-			var list = Arguments.ToArray<Value>();
+			var list = Arguments.GetValues();
 			if ( list[ 0 ] is Boolean )
 			{
 				var temp = new List<float>();
@@ -32,8 +32,7 @@ namespace Kento
 		}
 		public override Value Clone ()
 		{
-			var toReturn = new SLPolygon();
-			toReturn.Polygon = Polygon;
+			var toReturn = new SLPolygon { Polygon = Polygon };
 			return toReturn;
 		}
 	}

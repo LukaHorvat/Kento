@@ -8,10 +8,8 @@ OnLoad = function () {
 }
 OnUpdate = function () {
     time += 0.03
-	Console.Output( "Before " + System.MemoryUsage )
     shape.X = (Math.Sin( time ) + 1) * 350
     shape.Y = (Math.Cos( time ) + 1) * 200
-	Console.Output( "After " + System.MemoryUsage )
 }
  
 time = 0

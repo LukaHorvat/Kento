@@ -26,9 +26,9 @@ namespace Kento
 		{
 			return new Number( Compiler.GetMemoryUsage() );
 		}
-		public Value LocationOf ( Array Arguments )
+		public Value LocationOf ( List Arguments )
 		{
-			var adresses = Arguments.Arr.Select( Reference => new Number( Reference.Index ) ).Cast<Value>();
+			var adresses = Arguments.Arr.OfType<Reference>().Select( Reference => new Number( Reference.Index ) );
 			return new Array( adresses.Select( X => new Reference( X ) ).ToList() );
 		}
 	}

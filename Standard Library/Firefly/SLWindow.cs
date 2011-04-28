@@ -11,10 +11,11 @@ namespace Kento
 		{
 
 		}
-		public override Value Invoke ( Array Arguments )
+		public override Value Invoke ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Function ) onLoad = Arguments.Arr[ 0 ].ReferencingValue as Function;
-			if ( Arguments.GetReferenceAtIndex( 1 ).ReferencingValue is Function ) onUpdate = Arguments.Arr[ 1 ].ReferencingValue as Function;
+			var list = Arguments.GetValues();
+			if ( list[ 0 ] is Function ) onLoad = list[ 0 ] as Function;
+			if ( list[ 1 ] is Function ) onUpdate = list[ 1 ] as Function;
 			Firefly.Initialize( 800, 500, "Firefly Window", LoadEventInterface, true );
 			return this;
 		}

@@ -25,11 +25,6 @@
 			return toReturn;
 		}
 
-		public override Array ToArray ()
-		{
-			return new Array( this );
-		}
-
 		public override void Dereference ()
 		{
 			//Hard reference can't get dereferenced automatically

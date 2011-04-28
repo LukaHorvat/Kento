@@ -21,9 +21,9 @@ namespace Kento
 			return this;
 		}
 
-		public virtual Array ToArray ()
+		public virtual List ToList ()
 		{
-			return new Array( this );
+			return new List( this );
 		}
 
 		public virtual List<Token> Tokenize ()

@@ -9,9 +9,11 @@ namespace Kento
 		Indexable = 0x01
 	}
 
-	public class Instance : Value, IFunction, IHasMembers
+	public class Instance : Value, IInvokable, IHasMembers
 	{
 		public string ClassName { get; set; }
+		public string Name { get; set; }
+		public Scope ParentScope { get; set; }
 
 		public Instance ( IClass Type )
 			: this( Type.Identifiers, Type.Flags ) { ClassName = Type.Name; }
@@ -23,17 +25,20 @@ namespace Kento
 		{
 			this.Flags = Flags;
 			this.Identifiers = Identifiers.Clone();
-			RewireFunctions();
+			this.Identifiers.RewireFunctions();
 		}
 
-		#region IFunction Members
+		#region IInvokable Members
 
-		public virtual Value Invoke ( Array Arguments )
+		public virtual Value Invoke ( List Arguments )
 		{
 			if ( Identifiers.ContainsKey( "Constructor" ) )
 			{
 				Value constructor = Identifiers[ "Constructor" ].ReferencingValue;
-				if ( constructor is IFunction ) ( constructor as IFunction ).Invoke( Arguments );
+				if ( constructor is IInvokable )
+				{
+					( constructor as IInvokable ).Invoke( Arguments );
+				}
 			}
 			return this;
 		}
@@ -46,17 +51,6 @@ namespace Kento
 		public InstanceFlags Flags { get; set; }
 
 		#endregion
-
-		private void RewireFunctions ()
-		{
-			foreach ( var pair in Identifiers )
-			{
-				if ( pair.Value.ReferencingValue is Function )
-				{
-					( pair.Value.ReferencingValue as Function ).Scope = Identifiers;
-				}
-			}
-		}
 
 		public override Value Clone ()
 		{
@@ -73,7 +67,7 @@ namespace Kento
 
 		public override string ToString ()
 		{
-			return "Instance of " + ClassName;
+			return "Instance(" + Name + ") of <" + ClassName + ">";
 		}
 
 	}

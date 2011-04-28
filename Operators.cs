@@ -238,8 +238,7 @@ namespace Kento
 				if ( value1 is Number && value2 is Number )
 				{
 					( First as Reference ).ReferencingValue = new Number( ( value1 as Number ).Val + ( value2 as Number ).Val );
-					Value toReturn = ( First as Reference ).ReferencingValue;
-					return toReturn;
+					return First;
 				}
 				throw new Exception( "Operands need to be numbers" );
 			}
@@ -301,9 +300,9 @@ namespace Kento
 
 			if ( First is Reference )
 			{
-				if ( Second is IClass ) ( Second as IClass ).Name = ( First as Reference ).Identifier; //Give the class a name for easier debugging
+				if ( Second is INamable ) ( Second as INamable ).Name = ( First as Reference ).Identifier; //Give the object a name for easier debugging
 				Value toSet;
-				if ( Second is List ) toSet = Second.ToArray();
+				if ( Second is List ) toSet = Second.ToList();
 				else toSet = Second is Literal ? Second.Clone() : Second;
 
 				( First as Reference ).ReferencingValue = toSet;
@@ -546,13 +545,12 @@ namespace Kento
 		{
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference && !( Second is HardReference ) ) Second = ( Second as Reference ).ReferencingValue;
-			var array = Second.ToArray();
-			array.LiteralClone();
+			var list = Second.ToList();
 
-			if ( First is IFunction )
+			if ( First is IInvokable )
 			{
-				Value toReturn = ( First as IFunction ).Invoke( array );
-				array.Destroy();
+				Value toReturn = ( First as IInvokable ).Invoke( list );
+				list.Destroy();
 				if ( toReturn is HardReference ) toReturn = ( toReturn as HardReference ).ToNormalReference();
 				return toReturn;
 			}
@@ -597,7 +595,7 @@ namespace Kento
 
 		public override Value Operate ( Value First, Value Second )
 		{
-			return First.ToArray();
+			return First.ToList();
 		}
 	}
 
@@ -957,6 +955,7 @@ namespace Kento
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
+			if ( First is Boolean ) First = new CodeBlock( new[] { First as Token }.ToList() );
 			if ( First is Expression ) First = new CodeBlock( First as Expression );
 			if ( First is CodeBlock && Second is CodeBlock )
 			{
@@ -976,7 +975,7 @@ namespace Kento
 			if ( First is Reference ) First = ( First as Reference ).ReferencingValue;
 			if ( Second is Reference ) Second = ( Second as Reference ).ReferencingValue;
 
-			Array arr = First.ToArray();
+			var arr = First.ToList();
 
 			if ( Second is CodeBlock )
 			{

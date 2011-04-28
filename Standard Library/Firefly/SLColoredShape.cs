@@ -19,7 +19,7 @@ namespace Kento
 		{
 			return new ExternalClass( "ColoredShape", InstanceFlags.NoFlags, typeof( SLColoredShape ) );
 		}
-		public override Value Invoke ( Array Arguments )
+		public override Value Invoke ( List Arguments )
 		{
 			Shape = new ColoredShape();
 			Firefly.AddToRenderList( Shape );
@@ -42,7 +42,7 @@ namespace Kento
 		{
 			Shape.Y = (float)( (Number)NewValue ).Val;
 		}
-		public Value SetPolygons ( Array Arguments )
+		public Value SetPolygons ( List Arguments )
 		{
 			var fillPolys = FilledPoly.ToArray<SLPolygon>();
 			var outlinePolys = OutlinePoly.ToArray<SLPolygon>();

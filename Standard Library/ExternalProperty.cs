@@ -12,26 +12,26 @@ namespace Kento
 		{
 			this.OnChange = OnChange;
 			this.Static = Static;
-			Representation = Name;
+			this.Name = Name;
 			this.Value = Value;
 		}
 		public ExternalProperty ( string Name, bool Static, ChangeHandler OnChange, ExternalGetter External )
 		{
 			this.OnChange = OnChange;
 			this.Static = Static;
-			Representation = Name;
+			this.Name = Name;
 			this.External = External;
 		}
 		public ExternalProperty ( string Name, bool Static, Value Value )
 		{
 			this.Static = Static;
-			Representation = Name;
+			this.Name = Name;
 			this.Value = Value;
 		}
 		public ExternalProperty ( string Name, bool Static, ExternalGetter External )
 		{
 			this.Static = Static;
-			Representation = Name;
+			this.Name = Name;
 			this.External = External;
 		}
 	}

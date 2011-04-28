@@ -109,9 +109,11 @@ namespace Kento
 			Value toReturn = NoValue.Value;
 			if ( solvingStack.Count > 0 ) toReturn = solvingStack.Peek().Evaluate();
 			if ( toReturn is Reference ) toReturn = ( toReturn as Reference ).ReferencingValue;
+
 			Compiler.StoreValuesOutOfScope = true; //Make sure the returning value is not destroyed when exiting the function's scope
 			if ( toReturn is Literal ) toReturn = toReturn.Clone();
 			Compiler.StoreValuesOutOfScope = false;
+
 			if ( type != CodeBlockType.Loop && type != CodeBlockType.Type ) Compiler.ExitScope();
 			return toReturn;
 		}

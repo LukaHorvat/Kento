@@ -1,26 +1,14 @@
-OnLoad = function () {	
-	i = 0
-	while (i < 10) {
-		shape = new ColoredShape()
-		shape.FilledPolygons.Add( new Polygon( false, -50, -50, 1, 0, 0, 1,
-												50, -50, 0, 1, 0, 1,
-												50, 50, 0, 0, 1, 1,
-												-50, 50, 0, 1, 1, 1 ) )
-		shape.SetPolygons()
-		shapes.Add(shape)
-		i++
-	}
-}
-
-OnUpdate = function () {
-	i = 0
+Update = function () {
 	j = 0
-	while (i < 10) {
-		j++
-		i++
-	}
+	i = 0
+	Mention(i, j)
 	Console.Output( System.MemoryUsage )
 }
-time = 0
-shapes = new Array()
-Firefly.Initialize(OnLoad, OnUpdate)
+Mention = function ("Var") {
+	Console.Output(Var)
+}
+k = 0
+while ( k < 1000 ) {
+	Update()
+	k++
+}

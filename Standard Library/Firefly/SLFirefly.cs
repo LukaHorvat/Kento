@@ -11,7 +11,7 @@ namespace Kento
 				, new ExternalProperty( "FrameTime", true, () => new Number( Firefly.TotalTime ) )
 				, new ExternalProperty( "BackgroundColor", true, SetBackgroundColor, new SLColor( 0, 0, 0 ) ) );
 		}
-		public Value Initialize ( Array Arguments )
+		public Value Initialize ( List Arguments )
 		{
 			return new SLWindow().Invoke( Arguments );
 		}

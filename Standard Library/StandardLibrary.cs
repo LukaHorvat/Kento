@@ -26,7 +26,7 @@ namespace Kento
 				{
 					var segment = Activator.CreateInstance(type) as ILibrarySegment;
 					ExternalClass extClass = (segment).Load();
-					AddClass(extClass, extClass.Representation);
+					AddClass(extClass, extClass.Name);
 				}
 			}
 		}

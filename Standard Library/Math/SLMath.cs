@@ -32,63 +32,63 @@ namespace Kento
 			return pi;
 		}
 
-		public Value Sin ( Array Arguments )
+		public Value Sin ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Sin( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Sin( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Sin function takes only a number" );
 		}
 
-		public Value Cos ( Array Arguments )
+		public Value Cos ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Cos( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Cos( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Cos function takes only a number" );
 		}
 
-		public Value Tan ( Array Arguments )
+		public Value Tan ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Tan( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Tan( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Tan function takes only a number" );
 		}
 
-		public Value Asin ( Array Arguments )
+		public Value Asin ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Asin( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Asin( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Asin function takes only a number" );
 		}
 
-		public Value Acos ( Array Arguments )
+		public Value Acos ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Acos( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Acos( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Sin function takes only a number" );
 		}
 
-		public Value Atan ( Array Arguments )
+		public Value Atan ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Atan( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Atan( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Atan function takes only a number" );
 		}
 
-		public Value Floor ( Array Arguments )
+		public Value Floor ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Floor( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Floor( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Floor function takes only a number" );
 		}
 
-		public Value Ceiling ( Array Arguments )
+		public Value Ceiling ( List Arguments )
 		{
-			if ( Arguments.GetReferenceAtIndex( 0 ).ReferencingValue is Number )
-				return new Number( Math.Ceiling( ( (Number)Arguments.GetReferenceAtIndex( 0 ).ReferencingValue ).Val ) );
+			if ( Arguments.GetValue( 0 ) is Number )
+				return new Number( Math.Ceiling( ( (Number)Arguments.GetValue( 0 ) ).Val ) );
 			throw new Exception( "Ceiling function takes only a number" );
 		}
 
-		public Value Random ( Array Arguments )
+		public Value Random ( List Arguments )
 		{
 			return new Number( random.NextDouble() );
 		}

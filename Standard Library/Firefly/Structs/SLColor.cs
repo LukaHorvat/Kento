@@ -28,11 +28,12 @@ namespace Kento
 		{
 			return new ExternalClass( "Color", InstanceFlags.NoFlags, typeof( SLColor ) );
 		}
-		public override Value Invoke (Array Arguments)
+		public override Value Invoke ( List Arguments )
 		{
 			if ( Arguments.Arr.Count == 3 )
 			{
-				Value first = Arguments.Arr[ 0 ].ReferencingValue, second = Arguments.Arr[ 1 ].ReferencingValue, third = Arguments.Arr[ 2 ].ReferencingValue;
+				var list = Arguments.GetValues();
+				Value first = list[ 0 ], second = list[ 1 ], third = list[ 2 ];
 				if ( first is Number && second is Number && third is Number )
 				{
 					red = first as Number;

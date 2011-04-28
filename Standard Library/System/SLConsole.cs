@@ -17,22 +17,22 @@ namespace Kento
 
 		#endregion
 
-		public Value Output ( Array Arguments )
+		public Value Output ( List Arguments )
 		{
-			foreach ( Reference val in Arguments.Arr )
+			foreach ( var val in Arguments.GetValues() )
 			{
-				Console.Write( val.ReferencingValue.ToString() );
+				Console.Write( val );
 			}
 			Console.WriteLine();
 			return NoValue.Value;
 		}
 
-		public Value Input ( Array Arguments )
+		public Value Input ( List Arguments )
 		{
 			return new String( Console.ReadLine() );
 		}
 
-		public Value Clear ( Array Arguments )
+		public Value Clear ( List Arguments )
 		{
 			Console.Clear();
 			return NoValue.Value;

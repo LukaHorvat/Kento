@@ -74,8 +74,9 @@
     <Compile Include="FireflyGL\Window.cs" />
     <Compile Include="Interfaces\IClass.cs" />
     <Compile Include="Interfaces\IHasMembers.cs" />
-    <Compile Include="Interfaces\IFunction.cs" />
+    <Compile Include="Interfaces\IInvokable.cs" />
     <Compile Include="Interfaces\IIndexable.cs" />
+    <Compile Include="Interfaces\INamable.cs" />
     <Compile Include="Objects\ExpressionSequence.cs" />
     <Compile Include="ICanRunAtCompile.cs" />
     <Compile Include="Objects\Array.cs" />
@@ -99,7 +100,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Objects\String.cs" />
     <Compile Include="Scope.cs" />
-    <Compile Include="Standard Library\Array\SLArray.cs" />
     <Compile Include="Standard Library\Firefly\Structs\SLPolygon.cs" />
     <Compile Include="Standard Library\Firefly\Structs\SLColor.cs" />
     <Compile Include="Standard Library\Firefly\SLFirefly.cs" />

@@ -2,7 +2,7 @@
 
 namespace Kento
 {
-	internal class Type : CodeBlock, IClass
+	class Type : CodeBlock, IClass
 	{
 		public string Name { get; set; }
 
